@@ -1,8 +1,8 @@
 CFLAGS = -Wall -Wextra -Wconversion
 # -O0 -ggdb -Wno-builtin-declaration-mismatch
 
-SRCS = main.c elf_loader.c
-HDRS = elf_loader.h elfhead.h
+SRCS = main.c elf_reloc.c
+HDRS = elf_reloc.h elfhead.h
 PROD = main
 
 .PHONY: clean

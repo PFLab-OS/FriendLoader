@@ -11,4 +11,4 @@ typedef struct {
 } Elf64Exec;
 
 int elf64_parse(const void* elf_ptr, Elf64Exec* elf64_exec);
-int elf64_deploy(const Elf64Exec* elf64_exec, FILE* img_file);
+int elf64_reloc(const Elf64Exec* elf64_exec, FILE* img_file);

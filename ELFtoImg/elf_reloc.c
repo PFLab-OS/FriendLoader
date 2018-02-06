@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "elf_loader.h"
+#include "elf_reloc.h"
 
 static inline int is_elf(const Elf64_Ehdr* e_hdr);
 static inline int is_elf64(const Elf64_Ehdr* e_hdr);
@@ -54,7 +54,7 @@ static int fwrite_pos(
     FILE* file, long offset, const uint8_t* contents, size_t size);
 static int ffill_zero(FILE* file, long offset, size_t size);
 
-int elf64_deploy(const Elf64Exec* elf64_exec, FILE* img_file)
+int elf64_reloc(const Elf64Exec* elf64_exec, FILE* img_file)
 {
     const uint8_t* hdr = elf64_exec->header;
     const Elf64_Ehdr* e_hdr = elf64_exec->elf64_header;

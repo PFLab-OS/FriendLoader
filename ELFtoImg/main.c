@@ -5,7 +5,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 
-#include "elf_loader.h"
+#include "elf_reloc.h"
 
 static const void* get_mmap_ptr(const char* file_name);
 
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    if (elf64_deploy(&elf64_exec, img_file) == -1) {
+    if (elf64_reloc(&elf64_exec, img_file) == -1) {
         fputs("Failed to deploy ELF to an image.\n", stderr);
         return 1;
     }
