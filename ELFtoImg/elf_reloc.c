@@ -56,6 +56,11 @@ static int ffill_zero(FILE* file, long offset, size_t size);
 
 int elf64_reloc(const Elf64Exec* elf64_exec, FILE* img_file)
 {
+    printf("elf_reloc: starting relocation. "
+           "mem_size: %ld (0x%lx), align: %ld (0x%lx)\n",
+        elf64_exec->mem_size, elf64_exec->mem_size,
+        elf64_exec->align, elf64_exec->align);
+
     const uint8_t* hdr = elf64_exec->header;
     const Elf64_Ehdr* e_hdr = elf64_exec->elf64_header;
 
@@ -65,9 +70,11 @@ int elf64_reloc(const Elf64Exec* elf64_exec, FILE* img_file)
 
         switch (prog_hdr->p_type) {
         case PT_LOAD:
-            // memcpy(mem_buf + prog_hdr->p_vaddr,
-            //     &hdr[prog_hdr->p_offset],
-            //     prog_hdr->p_memsz);
+            printf("elf_reloc: relocating LOAD segment. "
+                   "offset: 0x%lx, size: %zu (0x%lx), end: 0x%lx\n",
+                (long)prog_hdr->p_vaddr,
+                prog_hdr->p_memsz, (long)prog_hdr->p_memsz,
+                (long)(prog_hdr->p_vaddr + prog_hdr->p_memsz));
             if (fwrite_pos(
                     img_file,
                     (long)prog_hdr->p_vaddr,
@@ -75,9 +82,6 @@ int elf64_reloc(const Elf64Exec* elf64_exec, FILE* img_file)
                     prog_hdr->p_memsz)
                 == -1)
                 return -1;
-            // memset(mem_buf + prog_hdr->p_vaddr + prog_hdr->p_filesz,
-            //     0,
-            //     prog_hdr->p_memsz - prog_hdr->p_filesz);
             if (ffill_zero(
                     img_file,
                     (long)(prog_hdr->p_vaddr + prog_hdr->p_filesz),
@@ -96,7 +100,11 @@ int elf64_reloc(const Elf64Exec* elf64_exec, FILE* img_file)
                                   + e_hdr->e_shentsize * i);
         if (sct_hdr->sh_type == SHT_NOBITS) {
             if ((sct_hdr->sh_flags & SHF_ALLOC) != 0) {
-                // memset(mem_buf + sct_hdr->sh_addr, 0, sct_hdr->sh_size);
+                printf("elf_reloc: zero-filling NOBITS section. "
+                       "offset: 0x%lx, size: %zu (0x%lx), end: 0x%lx\n",
+                    (long)sct_hdr->sh_addr,
+                    sct_hdr->sh_size, (long)sct_hdr->sh_size,
+                    (long)(sct_hdr->sh_addr + sct_hdr->sh_size));
                 if (ffill_zero(
                         img_file,
                         (long)sct_hdr->sh_addr,
@@ -107,7 +115,7 @@ int elf64_reloc(const Elf64Exec* elf64_exec, FILE* img_file)
         }
     }
 
-    printf("entry_point = 0x%lx\n", e_hdr->e_entry);
+    printf("elf_reloc: entry_point: 0x%lx\n", e_hdr->e_entry);
 
     return 0;
 }
@@ -145,8 +153,6 @@ static inline int is_machine_aarch64(const Elf64_Ehdr* e_hdr)
 static int fwrite_pos(
     FILE* file, long offset, const uint8_t* contents, size_t size)
 {
-    printf("fwrite_pos: offset = 0x%lx, size = %zu\n", offset, size);
-
     if (fseek(file, offset, SEEK_SET) == -1) {
         perror("fseek");
         return -1;
@@ -162,8 +168,6 @@ static int fwrite_pos(
 
 static int ffill_zero(FILE* file, long offset, size_t size)
 {
-    printf("ffill_zero: offset = 0x%lx, size = %zu\n", offset, size);
-
     enum { BUF_SIZE = 4096,
     };
     static uint8_t buf[BUF_SIZE] = {0};
