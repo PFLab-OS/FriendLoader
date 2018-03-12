@@ -4,8 +4,8 @@
 #include <linux/slab.h>
 #include <linux/uaccess.h>
 
-#include "deploy_dev.h"
 #include "deploy.h"
+#include "deploy_dev.h"
 
 #define DEV_NAME "friend_loader"
 #define MINOR_COUNT 1
