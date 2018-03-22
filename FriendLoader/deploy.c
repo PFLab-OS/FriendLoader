@@ -14,10 +14,10 @@ int deploy(const char* data, size_t size, loff_t offset)
     }
 
     write_phys_mem(DEPLOY_PHYS_ADDR_START + offset, data, size);
-    // pr_debug("deploy: deployed to physical memory [%llx - %llx] (%zu)\n",
-    //     DEPLOY_PHYS_ADDR_START + offset,
-    //     DEPLOY_PHYS_ADDR_START + offset + size,
-    //     size);
+    pr_debug("deploy: deployed to physical memory [%llx - %llx] (%zu)\n",
+        DEPLOY_PHYS_ADDR_START + offset,
+        DEPLOY_PHYS_ADDR_START + offset + size,
+        size);
 
     return 0;
 }

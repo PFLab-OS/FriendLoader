@@ -45,8 +45,8 @@ int __exit cpu_replug(void)
 
 static void select_unplug_cpu(void)
 {
-    // TODO: 環境・状況によって適切なCPUを選ぶ。
-    //       現在はCPUが8つあることを仮定し、決め打ちでCPU7をunplugしている。
+    // TODO: Choose an appropriate CPU regarding situation.
+    //       Currently choosing CPU 7 by deciding.
 
     unpluged_cpu = 7;
 }

@@ -59,9 +59,3 @@ $ cat [file] | sudo dd of=/dev/friend_loader
 ```console
 $ echo 1 | sudo tee /sys/module/friend_loader/boot/boot
 ```
-
-## TODO
-
-*
-*
-*
