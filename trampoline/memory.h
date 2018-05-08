@@ -27,7 +27,15 @@ enum class MemoryMap : uint64_t {
   kStack                  = 0x4000,
   kH2f                    = 0x5000,
   kF2h                    = 0x6000,
-  kEnd                    = 0x7000,
+  kGdt                    = 0x7000,
+  kTss                    = 0x8000,
+  kIst1                   = 0x9000,
+  kIst2                   = 0x9000,
+  kIst3                   = 0xa000,
+  kIst4                   = 0xb000,
+  kIst5                   = 0xc000,
+  kIst6                   = 0xd000,
+  kEnd                    = 0xe000,
 };
 
 static_assert(static_cast<uint64_t>(MemoryMap::kPml4t) == PML4T, "");

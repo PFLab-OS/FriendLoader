@@ -1,5 +1,6 @@
-#include"type.h"
+#include "trampoline.h"
 #include "channel.h"
+#include "gdt.h"
 
 void panic();
 
@@ -50,6 +51,8 @@ void do_signal(H2F &h2f) {
 }
 
 extern "C" void trampoline_main() {
+  Gdt gdt;
+  gdt.SetupProc();
   H2F h2f;
   F2H f2h;
   while(true) {
@@ -70,6 +73,7 @@ extern "C" void trampoline_main() {
       break;
     }
   }
+  while(true){}
 }
 
 void panic() {

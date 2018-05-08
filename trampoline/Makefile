@@ -1,4 +1,4 @@
-BOOTOBJS := bootentry.o main.o
+BOOTOBJS := bootentry.o main.o gdt.o x86_asm.o
 
 FLAGS := -Os -nostdinc -ffreestanding -fno-builtin -fomit-frame-pointer -fno-exceptions -fno-asynchronous-unwind-tables -fno-unwind-tables
 CXXFLAGS := $(FLAGS) --std=c++14
