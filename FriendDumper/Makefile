@@ -1,6 +1,7 @@
 obj-m := friend_dumper.o
 friend_dumper-objs := main.o dumper_dev.o
 
+# this should be replaced for your environment
 KERN_SRC := ~/linux-hikey960
 
 .PHONY: read deploy mod clean
@@ -12,11 +13,12 @@ read: reader
 
 # if old kernel module is already deployed, it will be automatically removed
 deploy:
+	make mod
 	./deploy.sh
 
 mod:
-	make -C $(KERN_SRC) M=$(PWD) modules
+	make -C $(KERN_SRC) M=$(CURDIR) modules
 
 clean:
 	rm -f reader
-	make -C $(KERN_SRC) M=$(PWD) clean
+	make -C $(KERN_SRC) M=$(CURDIR) clean

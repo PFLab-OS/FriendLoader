@@ -1,3 +1,9 @@
+/FriendLoader/.cache.mk
+/test
+/test.c
+/dhry.fl
+/ELFtoImg/main
+
 *.bin
 .ssh_config
 
