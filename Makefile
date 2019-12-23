@@ -1,6 +1,7 @@
 .PHONY: run read FORCE clean
 
-IMG := abcd.bin
+IMG := test.bin 
+DEPLOY_PHYS_ADDR_START := 0xba700000
 
 run: $(IMG)
 	IMG=$(abspath $(IMG)) make -C FriendLoader run
@@ -12,23 +13,24 @@ read:
 
 #dhry.bin: dhry.fl ELFtoImg/main
 #	ELFtoImg/main dhry.fl dhry.bin
-
+#
 #dhry.fl: FORCE
-#	cp ../dhrystone/dhry.fl ./
+#	make -C ~/dhrystone d
+#	cp ~/dhrystone/dhry.fl ./
 
-abcd.bin: abcd
+test.bin: test
 	make -C ELFtoImg
-	ELFtoImg/main abcd abcd.bin
+	ELFtoImg/main $< $@
 
-abcd: abcd.s
-	gcc -o abcd -ffreestanding -nostdlib -s -static\
-		-Xlinker -Ttext -Xlinker 0x0\
-	       	abcd.s
-
-#test: test.c
-#	gcc -o test -ffreestanding -nostdlib -static test.c
+# the order of source files is very important
+# because current friendloader ignores ELF's entry point
+# and execution will start from top of the first source file
+test: entry.s fllib.c test.c
+	gcc -o $@ -ffreestanding -nostdlib -s -static \
+		-Xlinker -Ttext -Xlinker $(DEPLOY_PHYS_ADDR_START)\
+		$^
 
 clean:
-	rm -f abcd abcd.bin
+	rm -f test.bin test
 	make -C FriendDumper clean
 	make -C FriendLoader clean
