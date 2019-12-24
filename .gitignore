@@ -1,7 +1,7 @@
 /FriendLoader/.cache.mk
+/FriendDumper/reader
 /test
 /dhry.fl
-/ELFtoImg/main
 
 *.bin
 .ssh_config

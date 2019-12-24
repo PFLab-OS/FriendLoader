@@ -1,7 +1,9 @@
-.PHONY: run read FORCE clean
+CFLAGS = -Wall -Wextra -Wconversion
 
 IMG := test.bin 
 DEPLOY_PHYS_ADDR_START := 0xba700000
+
+.PHONY: run read FORCE clean
 
 run: $(IMG)
 	IMG=$(abspath $(IMG)) make -C FriendLoader run
@@ -18,9 +20,8 @@ read:
 #	make -C ~/dhrystone d
 #	cp ~/dhrystone/dhry.fl ./
 
-test.bin: test
-	make -C ELFtoImg
-	ELFtoImg/main $< $@
+test.bin: test toimg
+	./toimg $< $@
 
 # the order of source files is very important
 # because current friendloader ignores ELF's entry point
@@ -30,7 +31,10 @@ test: entry.s fllib.c test.c
 		-Xlinker -Ttext -Xlinker $(DEPLOY_PHYS_ADDR_START)\
 		$^
 
+toimg: toimg.c
+	gcc $(CFLAGS) -o $@ $<
+
 clean:
-	rm -f test.bin test
+	rm -f test.bin test toimg
 	make -C FriendDumper clean
 	make -C FriendLoader clean
