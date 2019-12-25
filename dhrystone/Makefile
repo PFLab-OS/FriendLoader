@@ -43,8 +43,7 @@ GCCFLAGS= $(GCCOPTIM) $(TIME_FUNC) -DHZ=$(HZ) $(ENUMS) $(STRUCTASSIGN) $(CFL)
 #
 #		You shouldn't need to touch the rest
 #
-SRC=		dhry_1.c dhry_2.c
-HDR=		dhry.h
+SRC=		dhry.c
 
 UNIX_PROGS=	gcc_dry2 gcc_dry2reg
 
@@ -65,10 +64,10 @@ all:	$(PROGS)
 
 unix:	$(UNIX_PROGS)
 
-gcc_dry2:	$(SRC) $(HDR)
+gcc_dry2:	$(SRC)
 		$(GCC) $(GCCFLAGS) $(SRC) $(LFLAGS) -o $@
 
-gcc_dry2reg:	$(SRC) $(HDR)
+gcc_dry2reg:	$(SRC)
 		$(GCC) $(GCCFLAGS) -DREG=register $(SRC) $(LFLAGS) -o $@
 
 gethz:	gethz.c
