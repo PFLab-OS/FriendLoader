@@ -221,7 +221,7 @@ int main(int argc, const char **argv)
 		return 1;
 	}
 	
-	const char *imgname = (argc == 3 ? argv[2] : "img.bin");
+	const char *imgname = (argc == 3 ? argv[2] : "task.img");
 	FILE *imgfile = fopen(imgname, "w");
 	if (imgfile == NULL) {
 		perror("fopen");

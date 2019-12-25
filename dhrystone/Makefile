@@ -50,7 +50,7 @@ UNIX_PROGS=	gcc_dry2 gcc_dry2reg
 .PHONY:	all unix gethz
 
 # memo:
-# when run dhrystone, goot number of run is >10000000
+# when run dhrystone on linux, good number of run is >10000000
 # because if not, dhrystone says that it is too small
 # 
 # memo2:

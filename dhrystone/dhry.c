@@ -428,6 +428,12 @@ typedef struct record
           } variant;
       } Rec_Type, *Rec_Pointer;
 
+/* macro for output to friend_loader_buf */
+#ifdef FRIEND
+#define flbuf_put(x)	flbuf_put(x)
+#else
+#define flbuf_put(x)
+#endif
 
 /*
  ****************************************************************************
@@ -534,6 +540,9 @@ main ()
         /* Warning: With 16-Bit processors and Number_Of_Runs > 32000,  */
         /* overflow may occur for this array element.                   */
 
+#ifdef FRIEND /* determine num of runs */
+  Number_Of_Runs = 1000000;
+#else
   printf ("\n");
   printf ("Dhrystone Benchmark, Version 2.1 (Language: C)\n");
   printf ("\n");
@@ -556,6 +565,7 @@ main ()
   printf ("\n");
 
   printf ("Execution starts, %d runs through Dhrystone\n", Number_Of_Runs);
+#endif /* determine num of runs */
 
   /***************/
   /* Start timer */
@@ -574,6 +584,11 @@ main ()
 
   for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index)
   {
+    /* for debug */
+    if (Run_Index % 10 == 0)
+    {
+      flbuf_put(Run_Index);
+    }
 
     Proc_5();
     Proc_4();
@@ -633,6 +648,7 @@ main ()
   End_Time = clock();
 #endif
 
+#ifndef FRIEND /* notify exection end */
   printf ("Execution ends\n");
   printf ("\n");
   printf ("Final values of the variables used in the benchmark:\n");
@@ -685,14 +701,17 @@ main ()
   printf ("Str_2_Loc:           %s\n", Str_2_Loc);
   printf ("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\n");
   printf ("\n");
+#endif /* notify execution end */
 
   User_Time = End_Time - Begin_Time;
 
   if (User_Time < Too_Small_Time)
   {
+#ifndef FRIEND /* too small */
     printf ("Measured time too small to obtain meaningful results\n");
     printf ("Please increase number of runs\n");
     printf ("\n");
+#endif /* too small */
   }
   else
   {
@@ -706,11 +725,13 @@ main ()
     Dhrystones_Per_Second = ((float) HZ * (float) Number_Of_Runs)
                         / (float) User_Time;
 #endif
+#ifndef FRIEND /* result */
     printf ("Microseconds for one run through Dhrystone: ");
     printf ("%6.1f \n", Microseconds);
     printf ("Dhrystones per Second:                      ");
     printf ("%6.1f \n", Dhrystones_Per_Second);
     printf ("\n");
+#endif /* result */
   }
   
 }

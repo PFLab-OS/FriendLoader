@@ -7,6 +7,8 @@ static char *malloc_ptr = (char *)0xba700000 + 0x100000;
 /* DEPLOY_PHYS_ADDR_END - 1M (for stack) */
 static char * const malloc_end = (char *)0xbf6bffff - 0x100000;
 
+static int *flbuf = (int *)FRIEND_LOADER_BUF + 1;
+
 void exit(int status)
 {
 	int *flbuf = (int *)FRIEND_LOADER_BUF;
@@ -22,6 +24,21 @@ void *malloc(unsigned long size)
 	malloc_ptr += size;
 	if (malloc_ptr > malloc_end) { exit(-1); }
 	return ptr;
+}
+
+void flbuf_put(int x)
+{
+	*flbuf = x;
+	flbuf++;
+	if (flbuf == (int *)FRIEND_LOADER_BUF_END)
+		flbuf = (int *)FRIEND_LOADER_BUF + 1;
+}
+
+
+/* stub */
+long time()
+{
+	return 0;
 }
 
 char *strcpy(char *s1, const char *s2)
