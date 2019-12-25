@@ -8,7 +8,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-static const unsigned long deploy_paddr = 0xba700000UL;
+const unsigned long deploy_paddr = 0xba700000UL;
+const unsigned long imgsize_limit = 0x100000UL; /* 1MB */
 
 const void *get_mmap_ptr(const char *filename)
 {
@@ -117,7 +118,7 @@ int relocate(const char *elfptr, FILE *imgfile) {
 		(const Elf64_Phdr *)(elfptr + elfhdr->e_phoff);	
 	if (sizeof(*proghdrs) != elfhdr->e_phentsize) {
 		fprintf(stderr, "proghdr size\n");
-		return 1;
+		return -1;
 	}
 
 	/*
@@ -129,14 +130,20 @@ int relocate(const char *elfptr, FILE *imgfile) {
 	for (int i = 0; i < elfhdr->e_phnum; i++) {
 		if (proghdrs[i].p_vaddr < deploy_paddr)
 		       continue;	
-		unsigned long s = proghdrs[i].p_vaddr + proghdrs[i].p_memsz;
+		unsigned long s = proghdrs[i].p_vaddr + proghdrs[i].p_memsz
+				  - deploy_paddr;
 		imgsize = (s > imgsize ? s : imgsize);
 		unsigned long a = proghdrs[i].p_align;
 		imgalign = (a > imgalign ? a : imgalign);
 	}
+	if (imgsize > imgsize_limit) {
+		fprintf(stderr, "imgsize(0x%lx) too large (> 0x%lx)\n",
+			imgsize, imgsize_limit);
+		return -1;
+	}
 	
-	printf("elf_reloc: starting relocation. "
-	       "mem_size: %ld (0x%lx), align: %ld (0x%lx)\n",
+	printf("elf_reloc: starting relocation.\n"
+	       "imgsize: %ld (0x%lx), align: %ld (0x%lx)\n",
 	       imgsize, imgsize, imgalign, imgalign);
 	
 	for (int i = 0; i < elfhdr->e_phnum; i++) {
@@ -150,7 +157,7 @@ int relocate(const char *elfptr, FILE *imgfile) {
 		}
 		vaddr -= deploy_paddr;
 
-		printf("elf_reloc: relocating LOAD segment. "
+		printf("elf_reloc: relocating LOAD segment.\n"
 		       "offset: 0x%lx, size: %lu (0x%lx), end: 0x%lx\n",
 		       vaddr,
 		       proghdrs[i].p_memsz, proghdrs[i].p_memsz,
@@ -226,8 +233,10 @@ int main(int argc, const char **argv)
 		return 1;
 	}
 
-	if (relocate(elfptr, imgfile) == -1)
+	if (relocate(elfptr, imgfile) == -1) {
 		fprintf(stderr, "relocation failed\n");
+		return 1;
+	}
 
 	printf("relocation success\n");
 	return 0;

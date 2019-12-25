@@ -9,9 +9,9 @@ _start:
 	movk	x0, #0x117, lsl #16
 	str	w1, [x0]	
 
-	// sp = 0x1177800 (middle of friend_loader_buf)
-	mov	x0, #0x7800
-	movk	x0, #0x117, lsl #16
+	// DEPLOY_PHYS_ADDR_END (align 16)
+	mov	x0, #0xfff0
+	movk	x0, #0xbf6b, lsl #16
 	mov	sp, x0
 
 	bl	main

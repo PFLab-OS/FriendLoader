@@ -2,10 +2,10 @@
 
 extern int main();
 
-/* middle of friend_loader_buf */
-static char *malloc_ptr = (char *)0x1177800;
-/* end of friend_loader_buf */
-static char * const malloc_end = (char *)0x1178000;
+/* DEPLOY_PHYS_ADDR_START + 1M (for img) */
+static char *malloc_ptr = (char *)0xba700000 + 0x100000;
+/* DEPLOY_PHYS_ADDR_END - 1M (for stack) */
+static char * const malloc_end = (char *)0xbf6bffff - 0x100000;
 
 void exit(int status)
 {

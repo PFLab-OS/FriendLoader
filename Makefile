@@ -13,8 +13,8 @@ run: $(IMG)
 read:
 	make -C FriendDumper read
 
-#dhry.bin: dhry.fl ELFtoImg/main
-#	ELFtoImg/main dhry.fl dhry.bin
+#dhry.bin: dhry.fl toimg
+#	./toimg dhry.fl dhry.bin
 #
 #dhry.fl: FORCE
 #	make -C ~/dhrystone d
