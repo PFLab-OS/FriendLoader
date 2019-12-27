@@ -12,6 +12,6 @@
 void exit(int status);
 void flbuf_put(int x);
 void *malloc(unsigned long size);
-long time();
+long time(long* timer);
 char *strcpy(char *s1, const char *s2);
 int strcmp(const char *s1, const char *s2);

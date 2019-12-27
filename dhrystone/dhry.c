@@ -541,7 +541,7 @@ main ()
         /* overflow may occur for this array element.                   */
 
 #ifdef FRIEND /* determine num of runs */
-  Number_Of_Runs = 1000000;
+  Number_Of_Runs = 1000000; /* 10e+6 */
 #else
   printf ("\n");
   printf ("Dhrystone Benchmark, Version 2.1 (Language: C)\n");
@@ -585,10 +585,12 @@ main ()
   for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index)
   {
     /* for debug */
-    if (Run_Index % 10 == 0)
+    /*
+    if (Run_Index % 1000 == 0)
     {
       flbuf_put(Run_Index);
     }
+    */
 
     Proc_5();
     Proc_4();
@@ -725,7 +727,10 @@ main ()
     Dhrystones_Per_Second = ((float) HZ * (float) Number_Of_Runs)
                         / (float) User_Time;
 #endif
-#ifndef FRIEND /* result */
+#ifdef FRIEND /* result */
+    flbuf_put((int)Microseconds);
+    flbuf_put((int)Dhrystones_Per_Second);
+#else
     printf ("Microseconds for one run through Dhrystone: ");
     printf ("%6.1f \n", Microseconds);
     printf ("Dhrystones per Second:                      ");

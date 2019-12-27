@@ -23,6 +23,7 @@ TIME_FUNC=	-DTIME			# Use time(2) for measurement
 #TIME_FUNC=	-DTIMES			# Use times(2) for measurement
 
 # value of HZ is obtained from 'make gethz'
+# but now time() is used and HZ is irrelevant to result
 #HZ=		50			# Frequency of times(2) clock ticks
 #HZ=		60			# Frequency of times(2) clock ticks
 HZ=		100			# Frequency of times(2) clock ticks

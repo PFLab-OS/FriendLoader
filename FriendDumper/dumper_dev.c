@@ -93,18 +93,25 @@ static ssize_t dumper_dev_read(
 {
     unsigned int *flbuf = (unsigned int *)__friend_loader_buf;
     unsigned int *flbuf_phys = (unsigned int *)__pa_symbol(__friend_loader_buf);
-    int i;
+    int i, n;
+    unsigned int *p;
 
     pr_info("FriendLoader buffer info\n");
     pr_info("Physical address is %p\n", flbuf_phys);
     pr_info("Virtual address is %p\n", flbuf); 
     pr_info("Following addresses are physical addresses\n");
+
+    /* memory dump */
     /* size of flbuf is 4096B (from arch/arm64/kernel/head.S) */
-    for (i = 0; i < 4096/sizeof(unsigned int); ++i) {
-	    if (i%4 == 0) {
-		    printk("%p: ", flbuf_phys + i);
-	    }
-	    printk(KERN_CONT "%08x ", flbuf[i]);
+    n = 4096 / sizeof(unsigned int) / 4; 
+    for (i = 0; i < n; ++i) {
+        p = flbuf + (i * 4);
+	if (i != 0 && i != n-1
+            && p[0] == 0 && p[1] == 0 && p[2] == 0 && p[3] == 0) {
+            continue;
+	}
+        printk("%p: %08x %08x %08x %08x\n",
+               flbuf_phys + i, p[0], p[1], p[2], p[3]);
     }
 
 /* The following code doesn't seem to work properly */

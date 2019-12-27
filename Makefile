@@ -1,5 +1,6 @@
 CFLAGS = -Wall -Wextra -Wconversion
 
+# configure here to change friend task
 IMG := dhry.img 
 DEPLOY_PHYS_ADDR_START := 0xba700000
 
