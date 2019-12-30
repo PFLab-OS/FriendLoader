@@ -4,6 +4,9 @@
 /toimg
 /FriendDumper/reader
 /FriendLoader/.cache.mk
+/dhrystone/gcc_dry2
+/dhrystone/gcc_dry2reg
+/dhrystone/spin
 
 .ssh_config
 

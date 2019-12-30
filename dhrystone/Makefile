@@ -48,18 +48,7 @@ SRC=		dhry.c
 
 UNIX_PROGS=	gcc_dry2 gcc_dry2reg
 
-.PHONY:	all unix gethz
-
-# memo:
-# when run dhrystone on linux, good number of run is >10000000
-# because if not, dhrystone says that it is too small
-# 
-# memo2:
-# current result is
-# ---
-# Microseconds for one run through Dhrystone:    0.2 
-# Dhrystones per Second:                      5000000.0 
-# ---
+.PHONY:	all unix gethz run spinrun spinkill
 
 all:	$(PROGS)
 
@@ -76,8 +65,20 @@ gethz:	gethz.c
 	./gethz
 	rm gethz
 
-clean:
-	-rm -f *.o *.obj
+run: gcc_dry2
+	make spinrun
+	taskset --cpu-list 7 ./gcc_dry2
+	make spinkill
 
-clobber: clean
-	-rm -f $(UNIX_PROGS)
+spinrun: spinrun.sh spin
+	./spinrun.sh
+
+# send SIGTERM
+spinkill:
+	pkill --exact spin
+
+spin: spin.c
+	gcc -o spin spin.c
+
+clean:
+	rm -f *.o *.obj $(UNIX_PROGS) spin

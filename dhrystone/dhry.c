@@ -391,8 +391,13 @@
 
 /* General definitions: */
 
+#ifdef FRIEND /* header */
+#include "../fllib.h"
+#else
 #include <stdio.h>
-                /* for strcpy, strcmp */
+#include <stdlib.h>
+#include <string.h>
+#endif /* header */
 
 #define Null 0 
                 /* Value of a Null pointer */
@@ -463,9 +468,10 @@ char            Ch_1_Glob,
 int             Arr_1_Glob [50];
 int             Arr_2_Glob [50] [50];
 
-extern char     *malloc ();
-Enumeration     Func_1 ();
+/*
+Enumeration     Func_1 (); */
   /* forward declaration necessary since Enumeration may not simply be int */
+
 
 #ifndef REG
         Boolean Reg = false;
@@ -505,7 +511,23 @@ float           Microseconds,
 /* end of variables for time measurement */
 
 
-main ()
+/* prototype declaration (to avoid warnings) */
+void Proc_1 (REG Rec_Pointer Ptr_Val_Par);
+void Proc_2 (One_Fifty *Int_Par_Ref);
+void Proc_3 (Rec_Pointer *Ptr_Ref_Par);
+void Proc_4 (void);
+void Proc_5 (void);
+void Proc_6 (Enumeration Enum_Val_Par, Enumeration *Enum_Ref_Par);
+void Proc_7 (One_Fifty Int_1_Par_Val, One_Fifty Int_2_Par_Val,
+             One_Fifty *Int_Par_Ref);
+void Proc_8 (Arr_1_Dim Arr_1_Par_Ref, Arr_2_Dim Arr_2_Par_Ref,
+             int Int_1_Par_Val, int Int_2_Par_Val);
+Enumeration Func_1 (Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val);
+Boolean Func_2 (Str_30 Str_1_Par_Ref, Str_30 Str_2_Par_Ref);
+Boolean Func_3 (Enumeration Enum_Par_Val);
+
+
+int main ()
 /*****/
 
   /* main program, corresponds to procedures        */
@@ -543,6 +565,7 @@ main ()
 #ifdef FRIEND /* determine num of runs */
   Number_Of_Runs = 1000000; /* 10e+6 */
 #else
+  /*
   printf ("\n");
   printf ("Dhrystone Benchmark, Version 2.1 (Language: C)\n");
   printf ("\n");
@@ -556,6 +579,10 @@ main ()
     printf ("Program compiled without 'register' attribute\n");
     printf ("\n");
   }
+  */
+
+  Number_Of_Runs = 100000000; /* 10e+8 */
+  /*
   printf ("Please give the number of runs through the benchmark: ");
   {
     int n;
@@ -563,6 +590,7 @@ main ()
     Number_Of_Runs = n;
   }
   printf ("\n");
+  */
 
   printf ("Execution starts, %d runs through Dhrystone\n", Number_Of_Runs);
 #endif /* determine num of runs */
@@ -651,6 +679,7 @@ main ()
 #endif
 
 #ifndef FRIEND /* notify exection end */
+  /*
   printf ("Execution ends\n");
   printf ("\n");
   printf ("Final values of the variables used in the benchmark:\n");
@@ -703,6 +732,7 @@ main ()
   printf ("Str_2_Loc:           %s\n", Str_2_Loc);
   printf ("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\n");
   printf ("\n");
+  */
 #endif /* notify execution end */
 
   User_Time = End_Time - Begin_Time;
@@ -742,7 +772,7 @@ main ()
 }
 
 
-Proc_1 (Ptr_Val_Par)
+void Proc_1 (Ptr_Val_Par)
 /******************/
 
 REG Rec_Pointer Ptr_Val_Par;
@@ -776,7 +806,7 @@ REG Rec_Pointer Ptr_Val_Par;
 } /* Proc_1 */
 
 
-Proc_2 (Int_Par_Ref)
+void Proc_2 (Int_Par_Ref)
 /******************/
     /* executed once */
     /* *Int_Par_Ref == 1, becomes 4 */
@@ -799,7 +829,7 @@ One_Fifty   *Int_Par_Ref;
 } /* Proc_2 */
 
 
-Proc_3 (Ptr_Ref_Par)
+void Proc_3 (Ptr_Ref_Par)
 /******************/
     /* executed once */
     /* Ptr_Ref_Par becomes Ptr_Glob */
@@ -814,7 +844,7 @@ Rec_Pointer *Ptr_Ref_Par;
 } /* Proc_3 */
 
 
-Proc_4 () /* without parameters */
+void Proc_4 () /* without parameters */
 /*******/
     /* executed once */
 {
@@ -826,7 +856,7 @@ Proc_4 () /* without parameters */
 } /* Proc_4 */
 
 
-Proc_5 () /* without parameters */
+void Proc_5 () /* without parameters */
 /*******/
     /* executed once */
 {
@@ -875,7 +905,7 @@ extern  int     Int_Glob;
 extern  char    Ch_1_Glob;
 
 
-Proc_6 (Enum_Val_Par, Enum_Ref_Par)
+void Proc_6 (Enum_Val_Par, Enum_Ref_Par)
 /*********************************/
     /* executed once */
     /* Enum_Val_Par == Ident_3, Enum_Ref_Par becomes Ident_2 */
@@ -909,7 +939,7 @@ Enumeration *Enum_Ref_Par;
 } /* Proc_6 */
 
 
-Proc_7 (Int_1_Par_Val, Int_2_Par_Val, Int_Par_Ref)
+void Proc_7 (Int_1_Par_Val, Int_2_Par_Val, Int_Par_Ref)
 /**********************************************/
     /* executed three times                                      */ 
     /* first call:      Int_1_Par_Val == 2, Int_2_Par_Val == 3,  */
@@ -929,7 +959,7 @@ One_Fifty      *Int_Par_Ref;
 } /* Proc_7 */
 
 
-Proc_8 (Arr_1_Par_Ref, Arr_2_Par_Ref, Int_1_Par_Val, Int_2_Par_Val)
+void Proc_8 (Arr_1_Par_Ref, Arr_2_Par_Ref, Int_1_Par_Val, Int_2_Par_Val)
 /*********************************************************************/
     /* executed once      */
     /* Int_Par_Val_1 == 3 */
