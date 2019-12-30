@@ -4,15 +4,16 @@ CFLAGS = -Wall -Wextra -Wconversion
 IMG := dhry.img 
 DEPLOY_PHYS_ADDR_START := 0xba700000
 
-.PHONY: run read FORCE clean
-
 run: $(IMG)
-	IMG=$(abspath $(IMG)) make -C FriendLoader run
 	make -C FriendDumper deploy
+	IMG=$(abspath $(IMG)) make -C FriendLoader run
 	make -C FriendDumper read
 
 read:
 	make -C FriendDumper read
+
+spinkill:
+	make -C dhrystone spinkill
 
 test.img: test toimg
 	./toimg $< $@
@@ -25,23 +26,21 @@ test: entry.s fllib.c test.c
 		-Xlinker -Ttext -Xlinker $(DEPLOY_PHYS_ADDR_START)\
 		$^
 
-# for GCCFLAGS for dhry
-include dhrystone/Makefile
+dhrystone/dhry: FORCE
+	make -C dhrystone dhry
 
-dhry.img: dhry toimg
-	./toimg dhry dhry.img
-
-dhry: entry.s fllib.c dhrystone/dhry.c
-	gcc -o $@ -ffreestanding -nostdlib -s -static \
-		-Xlinker -Ttext -Xlinker $(DEPLOY_PHYS_ADDR_START)\
-		$(GCCFLAGS) -DFRIEND\
-		$^
+dhry.img: dhrystone/dhry toimg
+	./toimg $< dhry.img
 
 toimg: toimg.c
 	gcc $(CFLAGS) -o $@ $<
 
 clean:
 	rm -f test.bin test dhry.img dhry toimg
-	make -C dhrystone clobber
+	make -C dhrystone clean
 	make -C FriendDumper clean
 	make -C FriendLoader clean
+
+.PHONY: run read FORCE clean
+
+FORCE:

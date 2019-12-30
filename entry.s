@@ -15,11 +15,12 @@ _start:
 	mrs	x1, currentel
 	str	w1, [x0, #4]
 
-	// friend_loader_buf[2] = frequency (expected to be 19.2Mz)
+	// friend_loader_buf[2] = frequency (expected to be 1.92Mz)
 	// In arm reference manual,
 	// value of cntfrq_el0 is undefined and should be set,
-	// but 19.2Mz matches SoC manual's clock value
-	// so I suppose that frequency is 19.2Mz
+	// but 1.92MHz resembles 19.2Mz (SoC manual's clock value)
+	// and in all execution the value is same
+	// so I suppose that frequency is 1.92Mz
 	mrs	x1, cntfrq_el0
 	str	w1, [x0, #8]
 

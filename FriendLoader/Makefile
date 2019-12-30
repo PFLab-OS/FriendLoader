@@ -8,12 +8,11 @@ KERN_SRC := ~/linux-hikey960
 
 .PHONY: run deploy mod clean
 
-run:
-	make deploy
+run: deploy
+	make -C ../dhrystone spinrun
 	echo 1 | sudo tee /sys/module/friend_loader/boot/boot
 
-deploy:
-	make mod
+deploy: mod
 	./deploy.sh $(IMG)
 
 mod:

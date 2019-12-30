@@ -563,7 +563,7 @@ int main ()
         /* overflow may occur for this array element.                   */
 
 #ifdef FRIEND /* determine num of runs */
-  Number_Of_Runs = 1000000; /* 10e+6 */
+  Number_Of_Runs = 100000; /* 10e+5 */
 #else
   /*
   printf ("\n");
@@ -613,12 +613,10 @@ int main ()
   for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index)
   {
     /* for debug */
-    /*
-    if (Run_Index % 1000 == 0)
+    if (Run_Index % 10000 == 0)
     {
       flbuf_put(Run_Index);
     }
-    */
 
     Proc_5();
     Proc_4();
@@ -736,6 +734,7 @@ int main ()
 #endif /* notify execution end */
 
   User_Time = End_Time - Begin_Time;
+  flbuf_put(User_Time);
 
   if (User_Time < Too_Small_Time)
   {

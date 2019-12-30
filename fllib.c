@@ -12,8 +12,7 @@ static char * const malloc_end = (char *)0xbf6bffff - 0x100000;
 static int *flbuf = USER_FLBUF_BASE;
 
 static unsigned long time_cnt_start;
-static unsigned long cntfrq_el0 = 19200000;
-
+static unsigned long cntfrq_el0 = 1920000; /* 1.92MHz */
 
 void startup()
 {

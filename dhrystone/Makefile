@@ -39,7 +39,8 @@ GCCOPTIM=       -O
 
 LFLAGS=					#Loader Flags
 
-GCCFLAGS= $(GCCOPTIM) $(TIME_FUNC) -DHZ=$(HZ) $(ENUMS) $(STRUCTASSIGN) $(CFL)
+#GCCFLAGS= $(GCCOPTIM) $(TIME_FUNC) -DHZ=$(HZ) $(ENUMS) $(STRUCTASSIGN) $(CFL)
+GCCFLAGS= $(TIME_FUNC) -DHZ=$(HZ) $(ENUMS) $(STRUCTASSIGN) $(CFL)
 
 #
 #		You shouldn't need to touch the rest
@@ -59,6 +60,14 @@ gcc_dry2:	$(SRC)
 
 gcc_dry2reg:	$(SRC)
 		$(GCC) $(GCCFLAGS) -DREG=register $(SRC) $(LFLAGS) -o $@
+
+# for friendloader
+DEPLOY_PHYS_ADDR_START := 0xba700000
+dhry: ../entry.s ../fllib.c dhry.c
+	gcc -o $@ -ffreestanding -nostdlib -s -static \
+		-Xlinker -Ttext -Xlinker $(DEPLOY_PHYS_ADDR_START) \
+		$(GCCFLAGS) -DFRIEND \
+		$^
 
 gethz:	gethz.c
 	gcc -o gethz gethz.c
@@ -81,4 +90,4 @@ spin: spin.c
 	gcc -o spin spin.c
 
 clean:
-	rm -f *.o *.obj $(UNIX_PROGS) spin
+	rm -f *.o *.obj $(UNIX_PROGS) dhry spin
