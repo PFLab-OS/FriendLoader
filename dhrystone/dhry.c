@@ -397,6 +397,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #endif /* header */
 
 #define Null 0 
@@ -468,10 +472,6 @@ char            Ch_1_Glob,
 int             Arr_1_Glob [50];
 int             Arr_2_Glob [50] [50];
 
-/*
-Enumeration     Func_1 (); */
-  /* forward declaration necessary since Enumeration may not simply be int */
-
 
 #ifndef REG
         Boolean Reg = false;
@@ -525,6 +525,10 @@ void Proc_8 (Arr_1_Dim Arr_1_Par_Ref, Arr_2_Dim Arr_2_Par_Ref,
 Enumeration Func_1 (Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val);
 Boolean Func_2 (Str_30 Str_1_Par_Ref, Str_30 Str_2_Par_Ref);
 Boolean Func_3 (Enumeration Enum_Par_Val);
+void int_eq(int x, int y);
+void long_eq(long x, long y);
+void char_eq(char x, char y);
+void str_eq(const char *x, const char *y);
 
 
 int main ()
@@ -581,19 +585,32 @@ int main ()
   }
   */
 
-  Number_Of_Runs = 100000000; /* 10e+8 */
-  /*
-  printf ("Please give the number of runs through the benchmark: ");
-  {
-    int n;
-    scanf ("%d", &n);
-    Number_Of_Runs = n;
-  }
-  printf ("\n");
-  */
+  Number_Of_Runs = 5000000; /* 10e+6 */
 
+  printf ("\n");
   printf ("Execution starts, %d runs through Dhrystone\n", Number_Of_Runs);
 #endif /* determine num of runs */
+
+#ifndef FRIEND /* pipe and fork */
+  int pipebuf;
+  /* to_parent and to_child */
+  int to_p[2], to_c[2];
+  if (pipe(to_p) == -1 || pipe(to_c) == -1)
+    return -1;
+  /* read and write */
+  int to_p_r = to_p[0], to_p_w = to_p[1];
+  int to_c_r = to_c[0], to_c_w = to_c[1];
+  pid_t cpid = fork();
+  if (cpid == -1)
+	  return -1;
+  if (cpid == 0) {
+    close(to_p_r);
+    close(to_c_w);
+  } else {
+    close(to_p_w);
+    close(to_c_r);
+  }
+#endif /* pipe and fork */
 
   /***************/
   /* Start timer */
@@ -612,6 +629,7 @@ int main ()
 
   for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index)
   {
+    
     /* for debug */
     if (Run_Index % 10000 == 0)
     {
@@ -659,9 +677,19 @@ int main ()
     Proc_2 (&Int_1_Loc);
       /* Int_1_Loc == 5 */
 
+#ifndef FRIEND /* sync by pipe */
+    if (cpid == 0) {
+      write(to_p_w, &Run_Index, sizeof(Run_Index));
+      while (read(to_c_r, &pipebuf, sizeof(Run_Index)) == 0) {}
+    } else {
+      write(to_c_w, &Run_Index, sizeof(Run_Index));
+      while (read(to_p_r, &pipebuf, sizeof(Run_Index)) == 0) {}
+    }
+#endif /* sync by pipe */
+
   } /* loop "for Run_Index" */
 
-  /**************/
+ /**************/
   /* Stop timer */
   /**************/
   
@@ -676,62 +704,39 @@ int main ()
   End_Time = clock();
 #endif
 
-#ifndef FRIEND /* notify exection end */
-  /*
-  printf ("Execution ends\n");
-  printf ("\n");
-  printf ("Final values of the variables used in the benchmark:\n");
-  printf ("\n");
-  printf ("Int_Glob:            %d\n", Int_Glob);
-  printf ("        should be:   %d\n", 5);
-  printf ("Bool_Glob:           %d\n", Bool_Glob);
-  printf ("        should be:   %d\n", 1);
-  printf ("Ch_1_Glob:           %c\n", Ch_1_Glob);
-  printf ("        should be:   %c\n", 'A');
-  printf ("Ch_2_Glob:           %c\n", Ch_2_Glob);
-  printf ("        should be:   %c\n", 'B');
-  printf ("Arr_1_Glob[8]:       %d\n", Arr_1_Glob[8]);
-  printf ("        should be:   %d\n", 7);
-  printf ("Arr_2_Glob[8][7]:    %d\n", Arr_2_Glob[8][7]);
-  printf ("        should be:   Number_Of_Runs + 10\n");
-  printf ("Ptr_Glob->\n");
-  printf ("  Ptr_Comp:          %d\n", (int) Ptr_Glob->Ptr_Comp);
-  printf ("        should be:   (implementation-dependent)\n");
-  printf ("  Discr:             %d\n", Ptr_Glob->Discr);
-  printf ("        should be:   %d\n", 0);
-  printf ("  Enum_Comp:         %d\n", Ptr_Glob->variant.var_1.Enum_Comp);
-  printf ("        should be:   %d\n", 2);
-  printf ("  Int_Comp:          %d\n", Ptr_Glob->variant.var_1.Int_Comp);
-  printf ("        should be:   %d\n", 17);
-  printf ("  Str_Comp:          %s\n", Ptr_Glob->variant.var_1.Str_Comp);
-  printf ("        should be:   DHRYSTONE PROGRAM, SOME STRING\n");
-  printf ("Next_Ptr_Glob->\n");
-  printf ("  Ptr_Comp:          %d\n", (int) Next_Ptr_Glob->Ptr_Comp);
-  printf ("        should be:   (implementation-dependent), same as above\n");
-  printf ("  Discr:             %d\n", Next_Ptr_Glob->Discr);
-  printf ("        should be:   %d\n", 0);
-  printf ("  Enum_Comp:         %d\n", Next_Ptr_Glob->variant.var_1.Enum_Comp);
-  printf ("        should be:   %d\n", 1);
-  printf ("  Int_Comp:          %d\n", Next_Ptr_Glob->variant.var_1.Int_Comp);
-  printf ("        should be:   %d\n", 18);
-  printf ("  Str_Comp:          %s\n",
-                                Next_Ptr_Glob->variant.var_1.Str_Comp);
-  printf ("        should be:   DHRYSTONE PROGRAM, SOME STRING\n");
-  printf ("Int_1_Loc:           %d\n", Int_1_Loc);
-  printf ("        should be:   %d\n", 5);
-  printf ("Int_2_Loc:           %d\n", Int_2_Loc);
-  printf ("        should be:   %d\n", 13);
-  printf ("Int_3_Loc:           %d\n", Int_3_Loc);
-  printf ("        should be:   %d\n", 7);
-  printf ("Enum_Loc:            %d\n", Enum_Loc);
-  printf ("        should be:   %d\n", 1);
-  printf ("Str_1_Loc:           %s\n", Str_1_Loc);
-  printf ("        should be:   DHRYSTONE PROGRAM, 1'ST STRING\n");
-  printf ("Str_2_Loc:           %s\n", Str_2_Loc);
-  printf ("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\n");
-  printf ("\n");
-  */
-#endif /* notify execution end */
+#ifndef FRIEND /* exit child process */
+  pid_t waitres;
+  if (cpid == 0)
+    exit(0);
+  else
+    waitres = wait(NULL);
+  if (waitres == -1)
+    return -1;
+#endif /* exit child process */
+ 
+  /* assertion of result */
+  int_eq(Int_Glob, 5);
+  int_eq(Bool_Glob, 1);
+  char_eq(Ch_1_Glob, 'A');
+  char_eq(Ch_2_Glob, 'B');
+  int_eq(Arr_1_Glob[8], 7);
+  int_eq(Arr_2_Glob[8][7], Number_Of_Runs + 10);
+  int_eq(Ptr_Glob->Discr, 0);
+  int_eq(Ptr_Glob->variant.var_1.Enum_Comp, 2);
+  int_eq(Ptr_Glob->variant.var_1.Int_Comp, 17);
+  str_eq(Ptr_Glob->variant.var_1.Str_Comp, "DHRYSTONE PROGRAM, SOME STRING");
+  long_eq((long) Ptr_Glob->Ptr_Comp, (long) Next_Ptr_Glob->Ptr_Comp);
+  int_eq(Next_Ptr_Glob->Discr, 0);
+  int_eq(Next_Ptr_Glob->variant.var_1.Enum_Comp, 1);
+  int_eq(Next_Ptr_Glob->variant.var_1.Int_Comp, 18);
+  str_eq(Next_Ptr_Glob->variant.var_1.Str_Comp,
+         "DHRYSTONE PROGRAM, SOME STRING");
+  int_eq(Int_1_Loc, 5);
+  int_eq(Int_2_Loc, 13);
+  int_eq(Int_3_Loc, 7);
+  int_eq(Enum_Loc, 1);
+  str_eq(Str_1_Loc, "DHRYSTONE PROGRAM, 1'ST STRING");
+  str_eq(Str_2_Loc, "DHRYSTONE PROGRAM, 2'ND STRING");
 
   User_Time = End_Time - Begin_Time;
   flbuf_put(User_Time);
@@ -1067,3 +1072,30 @@ Enumeration Enum_Par_Val;
     return (false);
 } /* Func_3 */
 
+void int_eq(int x, int y)
+{
+  if (x == y)
+    return;
+  exit(3);
+}
+
+void long_eq(long x, long y)
+{
+  if (x == y)
+    return;
+  exit(3);
+}
+
+void char_eq(char x, char y)
+{
+  if (x == y)
+    return;
+  exit(3);
+}
+
+void str_eq(const char *x, const char *y)
+{
+  if (strcmp(x, y) == 0)
+    return;
+  exit(3);
+}

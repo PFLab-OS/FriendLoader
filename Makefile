@@ -41,6 +41,6 @@ clean:
 	make -C FriendDumper clean
 	make -C FriendLoader clean
 
-.PHONY: run read FORCE clean
+.PHONY: run read spinkill FORCE clean
 
 FORCE:

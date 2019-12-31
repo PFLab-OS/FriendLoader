@@ -41,5 +41,5 @@ _start:
 
 	// loop infinitely
 loop:
-	wfe
+	wfi
 	b	loop

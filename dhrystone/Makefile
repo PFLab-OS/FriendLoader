@@ -75,8 +75,9 @@ gethz:	gethz.c
 	rm gethz
 
 run: gcc_dry2
+	taskset --cpu-list 6,7 ./gcc_dry2
 	make spinrun
-	taskset --cpu-list 7 ./gcc_dry2
+	taskset --cpu-list 6,7 ./gcc_dry2
 	make spinkill
 
 spinrun: spinrun.sh spin
