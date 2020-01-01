@@ -62,11 +62,18 @@ gcc_dry2reg:	$(SRC)
 		$(GCC) $(GCCFLAGS) -DREG=register $(SRC) $(LFLAGS) -o $@
 
 # for friendloader
-DEPLOY_PHYS_ADDR_START := 0xba700000
-dhry: ../entry.s ../fllib.c dhry.c
+PADDR1 := 0xba700000
+dhry1: ../entry.S ../fllib.c dhry.c
 	gcc -o $@ -ffreestanding -nostdlib -s -static \
-		-Xlinker -Ttext -Xlinker $(DEPLOY_PHYS_ADDR_START) \
-		$(GCCFLAGS) -DFRIEND \
+		-Xlinker -Ttext -Xlinker $(PADDR1) \
+		$(GCCFLAGS) -DFRIEND -DTASK1 \
+		$^
+
+PADDR2 := 0xbc700000
+dhry2: ../entry.S ../fllib.c dhry.c
+	gcc -o $@ -ffreestanding -nostdlib -s -static \
+		-Xlinker -Ttext -Xlinker $(PADDR2) \
+		$(GCCFLAGS) -DFRIEND -DTASK2 \
 		$^
 
 gethz:	gethz.c
@@ -91,4 +98,4 @@ spin: spin.c
 	gcc -o spin spin.c
 
 clean:
-	rm -f *.o *.obj $(UNIX_PROGS) dhry spin
+	rm -f *.o *.obj $(UNIX_PROGS) dhry1 dhry2 spin

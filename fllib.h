@@ -1,8 +1,5 @@
 #pragma once
 
-#define FRIEND_LOADER_BUF	0x1177000
-#define FRIEND_LOADER_BUF_END	0x1178000
-
 /*
  * about malloc argument:
  * this hikey's size_t is "long unsigned int"

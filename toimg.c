@@ -8,7 +8,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-const unsigned long deploy_paddr = 0xba700000UL;
 const unsigned long imgsize_limit = 0x100000UL; /* 1MB */
 
 const void *get_mmap_ptr(const char *filename)
@@ -112,7 +111,7 @@ static int zerofill(FILE* file, unsigned long offset, size_t size)
 	return 0;
 }
 
-int relocate(const char *elfptr, FILE *imgfile) {
+int relocate(const char *elfptr, FILE *imgfile, unsigned long deploy_paddr) {
 	const Elf64_Ehdr *elfhdr = (const Elf64_Ehdr *)elfptr;
 	const Elf64_Phdr *proghdrs =
 		(const Elf64_Phdr *)(elfptr + elfhdr->e_phoff);	
@@ -210,18 +209,19 @@ int relocate(const char *elfptr, FILE *imgfile) {
 
 int main(int argc, const char **argv)
 {
-	if (argc != 2 && argc != 3) {
-		fprintf(stderr, "Usage: %s <input> [<output>]\n", argv[0]);
+	if (argc != 4) {
+		fprintf(stderr, "Usage: %s <input> <output> <taskn>\n",
+			argv[0]);
 		return 1;
 	}
-	
+
 	const char *elfptr = get_mmap_ptr(argv[1]);
 	if (elfptr == NULL) {
 		fprintf(stderr, "Failed to get mmap'ed file pointer\n");
 		return 1;
 	}
 	
-	const char *imgname = (argc == 3 ? argv[2] : "task.img");
+	const char *imgname = argv[2];
 	FILE *imgfile = fopen(imgname, "w");
 	if (imgfile == NULL) {
 		perror("fopen");
@@ -233,7 +233,17 @@ int main(int argc, const char **argv)
 		return 1;
 	}
 
-	if (relocate(elfptr, imgfile) == -1) {
+	unsigned long deploy_paddr;
+	if (strcmp(argv[3], "1") == 0) {
+		deploy_paddr = 0xba700000UL;
+	} else if (strcmp(argv[3], "2") == 0) {
+		deploy_paddr = 0xbc700000UL;
+	} else {
+		fprintf(stderr, "argv[3] = %s\n", argv[3]);
+		return 1;
+	}
+
+	if (relocate(elfptr, imgfile, deploy_paddr) == -1) {
 		fprintf(stderr, "relocation failed\n");
 		return 1;
 	}

@@ -111,7 +111,7 @@ static ssize_t dumper_dev_read(
             continue;
 	}
         printk("%p: %08x %08x %08x %08x\n",
-               flbuf_phys + i, p[0], p[1], p[2], p[3]);
+               flbuf_phys + (i * 4), p[0], p[1], p[2], p[3]);
     }
 
 /* The following code doesn't seem to work properly */

@@ -1,22 +1,31 @@
-#include <asm/io.h>
-#include <linux/kernel.h>
-
 #include "common.h"
 #include "deploy.h"
 
+#include <asm/io.h>
+#include <linux/kernel.h>
+
+#define MAXSIZE 0x100000 /* 1MB */
+
 static void write_phys_mem(phys_addr_t addr, const void* data, size_t size);
 
-int deploy(const char* data, size_t size, loff_t offset)
+int deploy(const char* data, size_t size, loff_t offset, int tcpu)
 {
-    if (DEPLOY_PHYS_ADDR_START + offset + size > DEPLOY_PHYS_ADDR_END) {
+    phys_addr_t addr;
+
+    if (offset + size > MAXSIZE) {
         pr_warn("deploy: file size too large\n");
         return -1;
     }
 
-    write_phys_mem(DEPLOY_PHYS_ADDR_START + offset, data, size);
+    if (tcpu == 1)
+        addr = PADDR1;
+    else
+        addr = PADDR2;
+
+    write_phys_mem(addr + offset, data, size);
     pr_debug("deploy: deployed to physical memory [%llx - %llx] (%zu)\n",
-        DEPLOY_PHYS_ADDR_START + offset,
-        DEPLOY_PHYS_ADDR_START + offset + size,
+        addr + offset,
+        addr + offset + size,
         size);
 
     return 0;

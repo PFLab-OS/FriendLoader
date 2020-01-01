@@ -66,7 +66,7 @@ static int __init friend_loader_init(void)
         return -1;
     }
 
-    pr_info("friend_loader_init: cpu %d down\n", ret);
+    pr_info("friend_loader_init: cpu %x down\n", ret);
 
     return 0;
 }
@@ -77,7 +77,7 @@ static void __exit friend_loader_exit(void)
     if (ret < 0) {
         pr_warn("friend_loader_exit: cpu_replug failed: %d\n", ret);
     } else {
-        pr_info("friend_loader_exit: cpu %d up\n", ret);
+        pr_info("friend_loader_exit: cpu %x up\n", ret);
     }
 
     kobject_put(boot_sysfs_kobj);
@@ -100,8 +100,8 @@ static ssize_t boot_sysfs_write(
     const char* buf,
     size_t count)
 {
-    if (cpu_start(DEPLOY_PHYS_ADDR_START) == 0) {
-        pr_info("friend_loader: starting cpu from 0x%lx\n", DEPLOY_PHYS_ADDR_START);
+    if (cpu_start() == 0) {
+        pr_info("friend_loader: starting cpu\n");
     } else {
         pr_warn("friend_loader: cpu_start failed\n");
     }

@@ -1,13 +1,23 @@
 #include "fllib.h"
 
+#ifdef TASK1
+#define PADDR			0xba700000
+#define FRIEND_LOADER_BUF	0x01177000
+#elif defined TASK2
+#define PADDR 			0xbc700000
+#define FRIEND_LOADER_BUF	0x01177800
+#endif
+
 #define USER_FLBUF_BASE	((int *)FRIEND_LOADER_BUF + 4)
 
 extern int main();
 
+static int * const flbuf_end = (int *)(FRIEND_LOADER_BUF + 0x800);
+
 /* DEPLOY_PHYS_ADDR_START + 1M (for img) */
-static char *malloc_ptr = (char *)0xba700000 + 0x100000;
-/* DEPLOY_PHYS_ADDR_END - 1M (for stack) */
-static char * const malloc_end = (char *)0xbf6bffff - 0x100000;
+static char *malloc_ptr = (char *)PADDR + 0x100000;
+/* DEPLOY_PHYS_ADDR_START + 31M (for stack) */
+static char * const malloc_end = (char *)PADDR + (31 * 0x100000);
 
 static int *flbuf = USER_FLBUF_BASE;
 
@@ -42,7 +52,7 @@ void flbuf_put(int x)
 {
 	*flbuf = x;
 	flbuf++;
-	if (flbuf == (int *)FRIEND_LOADER_BUF_END)
+	if (flbuf == flbuf_end)
 		flbuf = USER_FLBUF_BASE;
 }
 

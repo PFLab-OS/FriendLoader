@@ -1,0 +1,19 @@
+This file is memo of physical memory map related to FriendLoader
+a ~ b means a<= x < b is valid address as byte
+
+0x01177000 ~ 0x01178000 (4096B)	friend_loader_buf
+	0x01177000 ~ 0x01177010	system info 
+	0x01177010 ~ 0x01178000	friend task's output
+
+0xba700000 ~ 0xbf6c0000 (80896KB > 79MB)	friend task's deploy region
+	0xba700000 ~ 0xbc700000 (32MB)		first task's region
+		0xba700000 ~ 0xba800000 (1MB)	program
+		0xba800000 ~ 0xbc600000 (30MB)	malloc
+		0xbc600000 ~ 0xbc700000	(1MB)	stack
+	0xbc700000 ~ 0xbe700000 (32MB)		second task's region
+		0xbc700000 ~ 0xbc800000 (1MB)	program
+		0xbc800000 ~ 0xbe600000 (30MB)	malloc
+		0xbe600000 ~ 0xbe700000	(1MB)	stack
+	0xbe700000 ~ 0xbf6c0000 (16128KB > 15MB)	friend kernel's region
+
+
