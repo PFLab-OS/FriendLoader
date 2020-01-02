@@ -43,7 +43,7 @@ toimg: toimg.c
 	gcc $(CFLAGS) -o $@ $<
 
 clean:
-	rm -f test.bin test dhry1.img dhry2.img toimg
+	rm -f test.img test dhry1.img dhry2.img toimg
 	make -C dhrystone clean
 	make -C FriendDumper clean
 	make -C FriendLoader clean

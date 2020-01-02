@@ -7,7 +7,8 @@
 /dhrystone/gcc_dry2
 /dhrystone/gcc_dry2reg
 /dhrystone/spin
-/dhrystone/dhry
+/dhrystone/dhry1
+/dhrystone/dhry2
 
 .ssh_config
 

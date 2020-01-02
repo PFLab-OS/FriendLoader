@@ -591,8 +591,18 @@ int main ()
   printf ("Execution starts, %d runs through Dhrystone\n", Number_Of_Runs);
 #endif /* determine num of runs */
 
-#ifndef FRIEND /* pipe and fork */
   int pipebuf;
+#ifdef FRIEND /* pipe and fork */
+  int cpid = fork();
+  int to_p_r, to_p_w, to_c_r, to_c_w;
+  if (cpid != 0) {
+    to_p_r = 0;
+    to_c_w = 1;
+  } else {
+    to_p_w = 0;
+    to_c_r = 1;
+  }
+#else
   /* to_parent and to_child */
   int to_p[2], to_c[2];
   if (pipe(to_p) == -1 || pipe(to_c) == -1)
@@ -602,13 +612,13 @@ int main ()
   int to_c_r = to_c[0], to_c_w = to_c[1];
   pid_t cpid = fork();
   if (cpid == -1)
-	  return -1;
-  if (cpid == 0) {
-    close(to_p_r);
-    close(to_c_w);
-  } else {
+    return -1;
+  if (cpid != 0) {
     close(to_p_w);
     close(to_c_r);
+  } else {
+    close(to_p_r);
+    close(to_c_w);
   }
 #endif /* pipe and fork */
 
@@ -631,10 +641,12 @@ int main ()
   {
     
     /* for debug */
+    /*
     if (Run_Index % 10000 == 0)
     {
       flbuf_put(Run_Index);
     }
+    */
 
     Proc_5();
     Proc_4();
@@ -677,15 +689,23 @@ int main ()
     Proc_2 (&Int_1_Loc);
       /* Int_1_Loc == 5 */
 
-#ifndef FRIEND /* sync by pipe */
-    if (cpid == 0) {
-      write(to_p_w, &Run_Index, sizeof(Run_Index));
-      while (read(to_c_r, &pipebuf, sizeof(Run_Index)) == 0) {}
-    } else {
+    if (cpid != 0) {
       write(to_c_w, &Run_Index, sizeof(Run_Index));
-      while (read(to_p_r, &pipebuf, sizeof(Run_Index)) == 0) {}
+      read(to_p_r, &pipebuf, sizeof(Run_Index));
+      if (Run_Index != pipebuf) {
+        flbuf_put(Run_Index);
+        flbuf_put(pipebuf);
+        exit(4);
+      }
+    } else {
+      write(to_p_w, &Run_Index, sizeof(Run_Index));
+      read(to_c_r, &pipebuf, sizeof(Run_Index));
+      if (Run_Index != pipebuf) {
+        flbuf_put(Run_Index);
+        flbuf_put(pipebuf);
+        exit(4);
+      }
     }
-#endif /* sync by pipe */
 
   } /* loop "for Run_Index" */
 
@@ -708,8 +728,7 @@ int main ()
   pid_t waitres;
   if (cpid == 0)
     exit(0);
-  else
-    waitres = wait(NULL);
+  waitres = wait(NULL);
   if (waitres == -1)
     return -1;
 #endif /* exit child process */

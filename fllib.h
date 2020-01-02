@@ -8,7 +8,10 @@
  */
 void exit(int status);
 void flbuf_put(int x);
+int fork(void);
 void *malloc(unsigned long size);
-long time(long* timer);
+unsigned long read(int fd, void *buf, unsigned long count);
 char *strcpy(char *s1, const char *s2);
 int strcmp(const char *s1, const char *s2);
+long time(long* timer);
+unsigned long write(int fd, const void *buf, unsigned long count);
