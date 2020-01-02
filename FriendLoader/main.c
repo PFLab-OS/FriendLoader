@@ -1,7 +1,7 @@
-#include "booter.h"
 #include "common.h"
 #include "cpu_hotplug.h"
 #include "deploy_dev.h"
+#include "flsysfs.h"
 
 #include <linux/kernel.h>
 #include <linux/module.h>
@@ -18,9 +18,9 @@ static int __init friend_loader_init(void)
     // Device for storing program
     deploy_dev_init();
 
-    ret = booter_init();
+    ret = flsysfs_init();
     if (ret != 0) {
-        pr_warn("friend_loader_init: booter_init failed: %d\n", ret);
+        pr_warn("friend_loader_init: flsysfs_init failed: %d\n", ret);
         return -1;
     }
 
@@ -46,7 +46,7 @@ static void __exit friend_loader_exit(void)
     }
 
     deploy_dev_exit();
-    booter_exit();
+    flsysfs_exit();
 
     pr_info("friend_loader_exit: exit\n");
 }

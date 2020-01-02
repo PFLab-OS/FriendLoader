@@ -6,12 +6,11 @@ IMG2 := dhry2.img
 DEPLOY_PHYS_ADDR_START := 0xba700000
 
 run: $(IMG1) $(IMG2)
-	make -C FriendDumper deploy
 	IMG1=$(abspath $(IMG1)) IMG2=$(abspath $(IMG2)) make -C FriendLoader run
-	make -C FriendDumper read
+	make -C FriendLoader read
 
 read:
-	make -C FriendDumper read
+	make -C FriendLoader read
 
 spinkill:
 	make -C dhrystone spinkill
