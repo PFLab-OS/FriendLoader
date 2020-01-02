@@ -1,11 +1,14 @@
 #!/bin/bash
 
 # Usage: deploy.sh <imgfile>
+# insmod + deploy
 
 # errexit, nounset, xtrace
 set -eux
 
 test $# -eq 2
+
+# insmod
 
 if lsmod | grep friend_loader; then
 	sudo rmmod friend_loader.ko
@@ -22,6 +25,8 @@ if [ -e /dev/friend_loader2 ]; then
 fi
 sudo mknod /dev/friend_loader c $dev_id 0
 sudo mknod /dev/friend_loader2 c $dev_id2 0
+
+# deploy
 
 cat $1 | sudo dd of=/dev/friend_loader
 cat $2 | sudo dd of=/dev/friend_loader2

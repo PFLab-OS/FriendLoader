@@ -1,40 +1,13 @@
-#include <linux/interrupt.h>
-#include <linux/kernel.h>
-#include <linux/kobject.h>
-#include <linux/module.h>
-#include <linux/sysfs.h>
-
+#include "booter.h"
 #include "common.h"
 #include "cpu_hotplug.h"
 #include "deploy_dev.h"
 
+#include <linux/kernel.h>
+#include <linux/module.h>
+
 MODULE_DESCRIPTION("Friend Loader");
 MODULE_LICENSE("GPL v2");
-
-// Sysfs for start booting friend core
-static struct kobject* boot_sysfs_kobj;
-
-static ssize_t boot_sysfs_read(
-    struct kobject* kobj,
-    struct kobj_attribute* attr,
-    char* buf);
-
-static ssize_t boot_sysfs_write(
-    struct kobject* kobj,
-    struct kobj_attribute* attr,
-    const char* buf,
-    size_t count);
-
-static struct kobj_attribute boot_sysfs_attr
-    = __ATTR(boot, 0664, boot_sysfs_read, boot_sysfs_write);
-
-static struct attribute* boot_sysfs_attrs[] = {
-    &boot_sysfs_attr.attr,
-    NULL,
-};
-static struct attribute_group boot_sysfs_attr_group = {
-    .attrs = boot_sysfs_attrs,
-};
 
 static int __init friend_loader_init(void)
 {
@@ -45,17 +18,9 @@ static int __init friend_loader_init(void)
     // Device for storing program
     deploy_dev_init();
 
-    // Sysfs for start booting friend core
-    boot_sysfs_kobj = kobject_create_and_add("boot", &THIS_MODULE->mkobj.kobj);
-    if (!boot_sysfs_kobj) {
-        pr_warn("friend_loader_init: kobject_create_and_add failed");
-        return -1;
-    }
-
-    ret = sysfs_create_group(boot_sysfs_kobj, &boot_sysfs_attr_group);
+    ret = booter_init();
     if (ret != 0) {
-        kobject_put(boot_sysfs_kobj);
-        pr_warn("friend_loader_init: sysfs_create_group failed: %d\n", ret);
+        pr_warn("friend_loader_init: booter_init failed: %d\n", ret);
         return -1;
     }
 
@@ -80,33 +45,10 @@ static void __exit friend_loader_exit(void)
         pr_info("friend_loader_exit: cpu %x up\n", ret);
     }
 
-    kobject_put(boot_sysfs_kobj);
     deploy_dev_exit();
+    booter_exit();
 
     pr_info("friend_loader_exit: exit\n");
-}
-
-static ssize_t boot_sysfs_read(
-    struct kobject* kobj,
-    struct kobj_attribute* attr,
-    char* buf)
-{
-    return scnprintf(buf, PAGE_SIZE, "%s\n", "boot_sysfs: read");
-}
-
-static ssize_t boot_sysfs_write(
-    struct kobject* kobj,
-    struct kobj_attribute* attr,
-    const char* buf,
-    size_t count)
-{
-    if (cpu_start() == 0) {
-        pr_info("friend_loader: starting cpu\n");
-    } else {
-        pr_warn("friend_loader: cpu_start failed\n");
-    }
-
-    return (ssize_t)count;
 }
 
 module_init(friend_loader_init);
