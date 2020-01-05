@@ -1,2 +1,6 @@
-int flsysfs_init(void);
-void flsysfs_exit(void);
+#pragma once
+
+#include <linux/module.h>
+
+int __init flsysfs_init(void);
+void __exit flsysfs_exit(void);

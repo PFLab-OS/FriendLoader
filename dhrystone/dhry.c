@@ -567,7 +567,7 @@ int main ()
         /* overflow may occur for this array element.                   */
 
 #ifdef FRIEND /* determine num of runs */
-  Number_Of_Runs = 100000; /* 10e+5 */
+  Number_Of_Runs = 200000; /* 2 * 10e+5 */
 #else
   /*
   printf ("\n");
@@ -585,7 +585,7 @@ int main ()
   }
   */
 
-  Number_Of_Runs = 5000000; /* 10e+6 */
+  Number_Of_Runs = 5000000; /* 5 * 10e+6 */
 
   printf ("\n");
   printf ("Execution starts, %d runs through Dhrystone\n", Number_Of_Runs);

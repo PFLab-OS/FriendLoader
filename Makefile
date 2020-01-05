@@ -44,7 +44,6 @@ toimg: toimg.c
 clean:
 	rm -f test.img test dhry1.img dhry2.img toimg
 	make -C dhrystone clean
-	make -C FriendDumper clean
 	make -C FriendLoader clean
 
 .PHONY: run read spinkill FORCE clean

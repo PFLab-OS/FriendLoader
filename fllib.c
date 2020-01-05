@@ -19,7 +19,7 @@
 #define NUM_OF_FD		8
 #define QUEUE_SIZE		0x100000
 
-#define USER_FLBUF_BASE	((int *)FRIEND_LOADER_BUF + 4)
+#define USER_FLBUF_BASE	((int *)FRIEND_LOADER_BUF + 8)
 
 extern int main();
 
@@ -107,16 +107,7 @@ unsigned long read(int fd, void *buf, unsigned long count) {
 	return count;
 }
 
-char *strcpy(char *s1, const char *s2)
-{
-	int i;
-	for (i = 0; s2[i] != '\0'; ++i) {
-		s1[i] = s2[i];
-	}
-	s1[i] = s2[i];
-	return s1;
-}
-
+/*
 int strcmp(const char *s1, const char *s2)
 {
 	int i;
@@ -131,6 +122,17 @@ int strcmp(const char *s1, const char *s2)
 			return -1;
 		}
 	}
+}
+*/
+
+char *strcpy(char *s1, const char *s2)
+{
+	int i;
+	for (i = 0; s2[i] != '\0'; ++i) {
+		s1[i] = s2[i];
+	}
+	s1[i] = s2[i];
+	return s1;
 }
 
 long time(long *timer)
