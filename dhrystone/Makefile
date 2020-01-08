@@ -56,7 +56,7 @@ all:	$(PROGS)
 unix:	$(UNIX_PROGS)
 
 gcc_dry2:	$(SRC)
-		$(GCC) $(GCCFLAGS) $(SRC) $(LFLAGS) -o $@
+		$(GCC) $(GCCFLAGS) $(SRC) $(LFLAGS) -static -o $@
 
 gcc_dry2reg:	$(SRC)
 		$(GCC) $(GCCFLAGS) -DREG=register $(SRC) $(LFLAGS) -o $@

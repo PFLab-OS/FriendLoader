@@ -1,8 +1,7 @@
 *.img
-/dhry.fl
 /test
 /toimg
-/FriendDumper/reader
+/dryobj.dump
 /FriendLoader/.cache.mk
 /dhrystone/gcc_dry2
 /dhrystone/gcc_dry2reg

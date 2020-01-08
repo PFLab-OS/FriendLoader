@@ -569,22 +569,6 @@ int main ()
 #ifdef FRIEND /* determine num of runs */
   Number_Of_Runs = 200000; /* 2 * 10e+5 */
 #else
-  /*
-  printf ("\n");
-  printf ("Dhrystone Benchmark, Version 2.1 (Language: C)\n");
-  printf ("\n");
-  if (Reg)
-  {
-    printf ("Program compiled with 'register' attribute\n");
-    printf ("\n");
-  }
-  else
-  {
-    printf ("Program compiled without 'register' attribute\n");
-    printf ("\n");
-  }
-  */
-
   Number_Of_Runs = 5000000; /* 5 * 10e+6 */
 
   printf ("\n");
@@ -592,35 +576,33 @@ int main ()
 #endif /* determine num of runs */
 
   int pipebuf;
-#ifdef FRIEND /* pipe and fork */
-  int cpid = fork();
-  int to_p_r, to_p_w, to_c_r, to_c_w;
-  if (cpid != 0) {
-    to_p_r = 0;
-    to_c_w = 1;
-  } else {
-    to_p_w = 0;
-    to_c_r = 1;
-  }
+
+  int from_c, to_p, from_p, to_c;
+#ifdef FRIEND /* pipe */
+  from_c = 0; to_p = 0;
+  from_p = 1; to_c = 1;
 #else
-  /* to_parent and to_child */
-  int to_p[2], to_c[2];
-  if (pipe(to_p) == -1 || pipe(to_c) == -1)
+  int c_to_p[2], p_to_c[2];
+  if (pipe(c_to_p) == -1 || pipe(p_to_c) == -1)
     return -1;
-  /* read and write */
-  int to_p_r = to_p[0], to_p_w = to_p[1];
-  int to_c_r = to_c[0], to_c_w = to_c[1];
+  from_c = c_to_p[0], to_p = c_to_p[1];
+  from_p = p_to_c[0], to_c = p_to_c[1];
+#endif /* pipe */
+ 
   pid_t cpid = fork();
   if (cpid == -1)
     return -1;
+
+#ifndef FRIEND /* close unused pipefd */
   if (cpid != 0) {
-    close(to_p_w);
-    close(to_c_r);
+    close(to_p);
+    close(from_p);
   } else {
-    close(to_p_r);
-    close(to_c_w);
+    close(from_c);
+    close(to_c);
   }
-#endif /* pipe and fork */
+#endif /* close unused pipefd */
+
 
   /***************/
   /* Start timer */
@@ -690,16 +672,16 @@ int main ()
       /* Int_1_Loc == 5 */
 
     if (cpid != 0) {
-      write(to_c_w, &Run_Index, sizeof(Run_Index));
-      read(to_p_r, &pipebuf, sizeof(Run_Index));
+      write(to_c, &Run_Index, sizeof(Run_Index));
+      read(from_c, &pipebuf, sizeof(Run_Index));
       if (Run_Index != pipebuf) {
         flbuf_put(Run_Index);
         flbuf_put(pipebuf);
         exit(4);
       }
     } else {
-      write(to_p_w, &Run_Index, sizeof(Run_Index));
-      read(to_c_r, &pipebuf, sizeof(Run_Index));
+      write(to_p, &Run_Index, sizeof(Run_Index));
+      read(from_p, &pipebuf, sizeof(Run_Index));
       if (Run_Index != pipebuf) {
         flbuf_put(Run_Index);
         flbuf_put(pipebuf);
