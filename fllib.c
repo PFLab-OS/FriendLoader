@@ -84,7 +84,7 @@ void flbuf_put(int x)
 		flbuf = USER_FLBUF_BASE;
 }
 
-int fork()
+pid_t fork()
 {
 	return CPID;
 }
@@ -107,7 +107,6 @@ unsigned long read(int fd, void *buf, unsigned long count) {
 	return count;
 }
 
-/*
 int strcmp(const char *s1, const char *s2)
 {
 	int i;
@@ -123,7 +122,6 @@ int strcmp(const char *s1, const char *s2)
 		}
 	}
 }
-*/
 
 char *strcpy(char *s1, const char *s2)
 {

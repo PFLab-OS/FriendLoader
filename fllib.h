@@ -1,5 +1,7 @@
 #pragma once
 
+typedef int pid_t;
+
 /*
  * about malloc argument:
  * this hikey's size_t is "long unsigned int"
@@ -8,7 +10,7 @@
  */
 void exit(int status);
 void flbuf_put(int x);
-int fork(void);
+pid_t fork(void);
 void *malloc(unsigned long size);
 unsigned long read(int fd, void *buf, unsigned long count);
 char *strcpy(char *s1, const char *s2);
