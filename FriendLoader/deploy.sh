@@ -4,7 +4,9 @@
 # insmod + deploy
 
 # errexit, nounset, xtrace
-set -eux
+#set -eux
+# errexit, nounset
+set -eu
 
 test $# -eq 2
 

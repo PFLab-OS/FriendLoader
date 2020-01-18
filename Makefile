@@ -7,7 +7,13 @@ DEPLOY_PHYS_ADDR_START := 0xba700000
 
 run: $(IMG1) $(IMG2)
 	IMG1=$(abspath $(IMG1)) IMG2=$(abspath $(IMG2)) make -C FriendLoader run
-	make -C FriendLoader read
+	sleep 40
+	make -s dread
+	make -s spinkill
+
+# dhrystone read
+dread:
+	make -C FriendLoader dread
 
 read:
 	make -C FriendLoader read

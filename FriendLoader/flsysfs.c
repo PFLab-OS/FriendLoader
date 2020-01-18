@@ -1,9 +1,11 @@
 #include "flsysfs.h"
 #include "cpu_hotplug.h"
 
+#include <linux/delay.h> /* ssleep */
 #include <linux/kobject.h>
 #include <linux/module.h>
 #include <linux/sysfs.h>
+
 
 static ssize_t boot_store(struct kobject *kobj, struct kobj_attribute *attr,
                           const char *buf, size_t count)
@@ -20,6 +22,20 @@ static ssize_t boot_store(struct kobject *kobj, struct kobj_attribute *attr,
 /* above function (boot_store) is set as boot_attr.store by __ATTR_WO macro */
 static struct kobj_attribute boot_attr = __ATTR_WO(boot);
 
+static int eof = 0;
+
+/* for dhrystone experiment */
+static ssize_t dump_show(struct kobject *kobj, struct kobj_attribute *attr,
+                         char *buf)
+{
+    int volatile *flbuf;
+    if (eof) { return -1; }
+
+    flbuf = (int *)__friend_loader_buf;
+    while (flbuf[0] != 2) { ssleep(1); }
+    eof = 1;
+    return sprintf(buf, "\n--- %d ---\n\n", flbuf[8]);
+}
 
 static ssize_t dump_store(struct kobject *kobj, struct kobj_attribute *attr,
                           const char *buf, size_t count)
@@ -50,8 +66,8 @@ static ssize_t dump_store(struct kobject *kobj, struct kobj_attribute *attr,
     return (ssize_t)count;
 }
 
-/* above function (dump_store) is set as dump_attr.store by __ATTR_WO macro */
-static struct kobj_attribute dump_attr = __ATTR_WO(dump);
+/* above functions are set as dump_attr.show/store by __ATTR_RW macro */
+static struct kobj_attribute dump_attr = __ATTR_RW(dump);
 
 
 static struct attribute *friend_loader_attrs[] = {

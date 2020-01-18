@@ -13,6 +13,9 @@ run: deploy
 	make -C ../dhrystone spinrun
 	echo 1 | sudo tee /sys/module/friend_loader/boot
 
+dread:
+	sudo cat /sys/module/friend_loader/dump
+
 read:
 	echo 1 | sudo tee /sys/module/friend_loader/dump
 
