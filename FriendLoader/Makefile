@@ -1,26 +1,10 @@
 obj-m := friend_loader.o
 friend_loader-objs := main.o flsysfs.o cpu_hotplug.o deploy.o deploy_dev.o
 
-# this should be set by parent make or your own
-# IMG1 :=
-# IMG2 :=
 # this should be replaced for your environment
 KERN_SRC := ~/linux-hikey960
 
-.PHONY: run read deploy mod clean
-
-run: deploy
-	make -C ../dhrystone spinrun
-	echo 1 | sudo tee /sys/module/friend_loader/boot
-
-dread:
-	sudo cat /sys/module/friend_loader/dump
-
-read:
-	echo 1 | sudo tee /sys/module/friend_loader/dump
-
-deploy: mod
-	./deploy.sh $(IMG1) $(IMG2)
+.PHONY: deploy mod clean
 
 mod:
 	make -C $(KERN_SRC) M=$(CURDIR) modules

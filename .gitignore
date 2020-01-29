@@ -1,13 +1,13 @@
 *.img
-/test
+*.elf
+pid.txt
+
 /toimg
-/dryobj.dump
 /FriendLoader/.cache.mk
-/dhrystone/gcc_dry2
-/dhrystone/gcc_dry2reg
-/dhrystone/spin
-/dhrystone/dhry1
-/dhrystone/dhry2
+/experiment/others
+/experiment/readtask
+/experiment/res0126
+/sandbox/
 
 .ssh_config
 

@@ -14,6 +14,8 @@ a ~ b means a<= x < b is valid address as byte
 		0xbc700000 ~ 0xbc800000 (1MB)	program
 		0xbc800000 ~ 0xbe600000 (30MB)	malloc
 		0xbe600000 ~ 0xbe700000	(1MB)	stack
-	0xbe700000 ~ 0xbf6c0000 (16128KB > 15MB)	friend kernel's region
+	0xbe70000 ~ 0xbe800000 (1MB)		nothing
+	treated as device memory:
+	0xbe800000 ~ 0xbf6c0000 (15104KB > 14MB)	friend kernel's region
 
 

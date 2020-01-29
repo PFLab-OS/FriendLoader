@@ -7,10 +7,10 @@
 
 ## Usage
 
-* Fix `KERN_SRC` of `FriendDumper/Makefile` and `FriendLoader/Makefile`
+* Fix `KERN_SRC` of `FriendLoader/Makefile`
 
-```console
-$ make
-```
+* `make ready` will compile kernel module and a tool (toimg)
 
-* For the details, see each Makefile
+* `cd sample` and `make run` will do sample execution
+
+* For the details, see each files

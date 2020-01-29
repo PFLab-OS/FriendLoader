@@ -353,6 +353,13 @@
                 /* Use times(2) time function unless    */
                 /* explicitly defined otherwise         */
 
+/* top priority */
+#ifdef CLOCK
+#undef TIME
+#undef TIMES
+#undef MSC_CLOCK
+#endif
+
 #ifdef MSC_CLOCK
 #undef HZ
 #undef TIMES
@@ -365,6 +372,13 @@
 #include <sys/types.h>
 #include <sys/times.h>
                 /* for "times" */
+#endif
+
+/* for clock_gettime */
+#ifdef CLOCK
+#ifndef FRIEND
+#include <time.h>
+#endif
 #endif
 
 #define Mic_secs_Per_Second     1000000.0
@@ -392,7 +406,7 @@
 /* General definitions: */
 
 #ifdef FRIEND /* header */
-#include "../fllib.h"
+#include "../fllib/fllib.h"
 #else
 #include <stdio.h>
 #include <stdlib.h>
@@ -501,14 +515,24 @@ extern long     time();
 extern clock_t	clock();
 #define Too_Small_Time (2*HZ)
 #endif
+#ifdef CLOCK
+#define Too_Small_Time 1
+#endif
 
+#ifdef CLOCK
+struct timespec startts, endts;
+double dps;
+#else
 long            Begin_Time,
                 End_Time,
                 User_Time;
 float           Microseconds,
                 Dhrystones_Per_Second;
+#endif
 
 /* end of variables for time measurement */
+
+/* variables for multi process */
 
 
 /* prototype declaration (to avoid warnings) */
@@ -567,14 +591,23 @@ int main ()
         /* overflow may occur for this array element.                   */
 
 #ifdef FRIEND /* determine num of runs */
-  Number_Of_Runs = 200000; /* 2 * 10e+5 */
+#ifdef MULTIPROC /* friend */
+  Number_Of_Runs = 10000; /* 1 * 10e+4 */
 #else
-  Number_Of_Runs = 5000000; /* 5 * 10e+6 */
-
-  printf ("\n");
+  Number_Of_Runs = 10000; /* 1 * 10e+4 */
+#endif /* friend */
+#else
+#ifdef MULTIPROC /* linux */
+  Number_Of_Runs = 500000; /* 5 * 10e+5 */
+#else
+  Number_Of_Runs = 10000000; /* 1 * 10e+7 */
+#endif /* linux */
+  /*
   printf ("Execution starts, %d runs through Dhrystone\n", Number_Of_Runs);
+  */
 #endif /* determine num of runs */
 
+#ifdef MULTIPROC /* prepare for inter-process communications */
   int pipebuf;
 
   int from_c, to_p, from_p, to_c;
@@ -603,6 +636,8 @@ int main ()
   }
 #endif /* close unused pipefd */
 
+#endif /* prepare for inter-process communications */
+
 
   /***************/
   /* Start timer */
@@ -617,6 +652,9 @@ int main ()
 #endif
 #ifdef MSC_CLOCK
   Begin_Time = clock();
+#endif
+#ifdef CLOCK
+  clock_gettime(CLOCK_MONOTONIC, &startts);
 #endif
 
   for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index)
@@ -671,23 +709,43 @@ int main ()
     Proc_2 (&Int_1_Loc);
       /* Int_1_Loc == 5 */
 
+#ifdef MULTIPROC /* inter-process communication */
     if (cpid != 0) {
       write(to_c, &Run_Index, sizeof(Run_Index));
       read(from_c, &pipebuf, sizeof(Run_Index));
+      /*
+      flbuf_put(0x100);
+      flbuf_put(0x100);
+      flbuf_put(Run_Index);
+      flbuf_put(pipebuf);
       if (Run_Index != pipebuf) {
+      	flbuf_put(0x100);
+      	flbuf_put(0x100);
         flbuf_put(Run_Index);
         flbuf_put(pipebuf);
         exit(4);
       }
+      */
     } else {
       write(to_p, &Run_Index, sizeof(Run_Index));
       read(from_p, &pipebuf, sizeof(Run_Index));
+      /*
+      flbuf_put(0x100);
+      flbuf_put(0x100);
+      flbuf_put(Run_Index);
+      flbuf_put(pipebuf);
+      */
+      /*
       if (Run_Index != pipebuf) {
+      	flbuf_put(0x100);
+      	flbuf_put(0x100);
         flbuf_put(Run_Index);
         flbuf_put(pipebuf);
         exit(4);
       }
+      */
     }
+#endif /* inter-process communitacon */
 
   } /* loop "for Run_Index" */
 
@@ -705,14 +763,19 @@ int main ()
 #ifdef MSC_CLOCK
   End_Time = clock();
 #endif
+#ifdef CLOCK
+  clock_gettime(CLOCK_MONOTONIC, &endts);
+#endif
 
 #ifndef FRIEND /* exit child process */
+#ifdef MULTIPROC
   pid_t waitres;
   if (cpid == 0)
-    exit(0);
+    exit(2);
   waitres = wait(NULL);
   if (waitres == -1)
     return -1;
+#endif
 #endif /* exit child process */
  
   /* assertion of result */
@@ -739,8 +802,24 @@ int main ()
   str_eq(Str_1_Loc, "DHRYSTONE PROGRAM, 1'ST STRING");
   str_eq(Str_2_Loc, "DHRYSTONE PROGRAM, 2'ND STRING");
 
+#ifdef CLOCK
+  double diff_sec = endts.tv_sec - startts.tv_sec;
+  double diff_nsec = endts.tv_nsec - startts.tv_nsec;
+  diff_sec = diff_sec + (diff_nsec * 0.000000001);
+  flbuf_put((int)((double)Number_Of_Runs / diff_sec));
+#ifndef FRIEND
+  if (diff_sec < Too_Small_Time) {
+    printf ("Measured time too small to obtain meaningful results\n");
+    printf ("Please increase number of runs\n");
+    printf ("\n");
+  } else {
+    printf("%f\n", (double)Number_Of_Runs / diff_sec);
+  }
+#endif
+
+#else
   User_Time = End_Time - Begin_Time;
-  flbuf_put(User_Time);
+  /* flbuf_put(User_Time); */
 
   if (User_Time < Too_Small_Time)
   {
@@ -763,17 +842,24 @@ int main ()
                         / (float) User_Time;
 #endif
 #ifdef FRIEND /* result */
-    flbuf_put((int)Microseconds);
+    /* flbuf_put((int)Microseconds); */
     flbuf_put((int)Dhrystones_Per_Second);
 #else
+    /*
     printf ("Microseconds for one run through Dhrystone: ");
     printf ("%6.1f \n", Microseconds);
     printf ("Dhrystones per Second:                      ");
+    */
     printf ("%6.1f \n", Dhrystones_Per_Second);
+    /*
     printf ("\n");
+    */
 #endif /* result */
   }
-  
+
+#endif /* CLOCK */
+
+  return 0;
 }
 
 

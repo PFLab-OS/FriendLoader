@@ -8,6 +8,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#define DEPLOY_PADDR1	0xba700000UL
+#define DEPLOY_PADDR2	0xbc700000UL
+
 const unsigned long imgsize_limit = 0x100000UL; /* 1MB */
 
 const void *get_mmap_ptr(const char *filename)
@@ -235,9 +238,9 @@ int main(int argc, const char **argv)
 
 	unsigned long deploy_paddr;
 	if (strcmp(argv[3], "1") == 0) {
-		deploy_paddr = 0xba700000UL;
+		deploy_paddr = DEPLOY_PADDR1;
 	} else if (strcmp(argv[3], "2") == 0) {
-		deploy_paddr = 0xbc700000UL;
+		deploy_paddr = DEPLOY_PADDR2;
 	} else {
 		fprintf(stderr, "argv[3] = %s\n", argv[3]);
 		return 1;

@@ -1,9 +1,9 @@
 // entry point of friend task
 .text
-	.global _start
+.globl	_start
 _start:
 
-// sp = DEPLOY_PHYS_ADDR + 31MB (align 16)
+// sp = DEPLOY_PHYS_ADDR + 31MB - 64KB (align 16)
 #ifdef TASK1
 	mov	x0, #0xbc70
 	movk	x0, #0x0000, lsl #16
@@ -63,11 +63,13 @@ _start:
 	// Inner Write-Back Write-Allocate Cacheable
 	// TCR_EL2.T0SZ = 32
 	ldr	x1, =0x80803520
+	//ldr	x1, =0x80803a20 write-through
 	msr	tcr_el2, x1
 	dsb	sy
 	isb
 	mrs	x1, tcr_el2
 	str	w1, [x0, #4]
+
 
 	// set MAIR_EL2
 	// friend_loader_buf[2] = MAIR_EL2[31:0]
@@ -77,6 +79,8 @@ _start:
 	// Read: Allocate, Write: Allocate
 	// Normal memory, Inner Write-Back Non-transient,
 	// Read: Allocate, Write: Allocate
+	// MAIR_EL2.Attr2 =
+	// Device memory, nGnRnE
 	ldr	x1, =0xff000000
 	msr	mair_el2, x1
 	dsb 	sy
@@ -87,7 +91,7 @@ _start:
 	// set TTBR0_EL2
 	// friend_loader_buf[3] = TTBR0_EL2[31:0]
 	// TTBR0_EL2 is Translation Table Base Register 0 (EL2)
-	ldr	x1, = level1_table
+	adr	x1, level1_table
 	msr	ttbr0_el2, x1
 	dsb	sy
 	isb
@@ -101,16 +105,27 @@ _start:
 	mrs	x1, sctlr_el2
 	orr	x1, x1, #(0x1 << 2)	// data cache
 	orr	x1, x1, #(0x1 << 12)	// instruction cache
-	// orr	x1, x1, #0x1		// MMU
+	//orr	x1, x1, #0x1		// MMU
 	msr	sctlr_el2, x1
 	dsb	sy
 	isb
 	mrs	x1, sctlr_el2
 	str	w1, [x0, #16]
 
-	// jump to startup (in fllib) to jump to main
-	bl	startup
+/*
+	// friend_loader[6:7] = translation
+	ldr	x1, =0x01170000
+	at	s12e1r, x1
+	mrs	x1, par_el1
+	str	x1, [x0, #24]
+	b	poweroff
+*/
 
+	// jump to startup (in fllib) to jump to main
+	b	startup
+
+.globl	exitsucc
+exitsucc:
 	// friend_loader_buf[0] = 2 (as 4B)
 	// to show execution end 
 	mov	w1, #2
@@ -125,6 +140,8 @@ _start:
 
 // cpu power off to replug
 // mimic of /arch/arm64/kernel/psci.c cpu_psci_cpu_die()
+.globl	poweroff
+poweroff:
 	// x0 = PSCI_0_2_FN_CPU_OFF
 	mov	x0, #0x0002
 	movk	x0, #0x8400, lsl #16
@@ -165,14 +182,19 @@ level1_table:
 	// ATTR = 0 means
 	// NSTable = 0, APTable = 0, XNTable = 0, PXNTable = 0
 	TABLE_ENTRY	level2_table0, 0
-	TABLE_ENTRY	level2_table0, 0
+	PUT_64B		0, 0
 	TABLE_ENTRY	level2_table2, 0
-	TABLE_ENTRY	level2_table2, 0
+	PUT_64B		0, 0
 
 .align 12
 level2_table0:
-	.set		ADDR, 0x0
-.rept 0x200
+	.set		ADDR, 0x000
+// 0x000 ~ 0x010
+.rept 0x008
+	PUT_64B		0, 0
+	.set		ADDR, ADDR+2
+.endr
+// 0x010 ~ 0x012
 	// ATTR_HI = 0 means XN = 0
 	// ATTR_LO = 0x74c means
 	// AF = 1
@@ -180,14 +202,24 @@ level2_table0:
 	// AP = R/W from higher level and R/W from EL0
 	// NS = non-secure
 	// AttrIndx = 3
-	BLOCK_2MB	(ADDR << 20), 0, 0x74c	
+	BLOCK_2MB	(ADDR << 20), 0, 0x748
+	.set		ADDR, ADDR+2
+// 0x012 ~ 0x400
+.rept 0x1f7
+	PUT_64B		0, 0
 	.set		ADDR, ADDR+2
 .endr
 
 .align 12
 level2_table2:
-	.set		ADDR, 0x0
-.rept 0x200
+	.set		ADDR, 0x800
+// 0x800 ~ 0xba6
+.rept 0x1d3
+	PUT_64B		0, 0
+	.set		ADDR, ADDR+2
+.endr
+// 0xba6 ~ 0xbe8
+.rept 0x021
 	// ATTR_HI = 0 means XN = 0
 	// ATTR_LO = 0x74c means
 	// AF = 1
@@ -195,7 +227,18 @@ level2_table2:
 	// AP = R/W from higher level and R/W from EL0
 	// NS = non-secure
 	// AttrIndx = 3
-	BLOCK_2MB	(ADDR << 20), 0, 0x74c	
+	BLOCK_2MB	(ADDR << 20), 0, 0x748
 	.set		ADDR, ADDR+2
 .endr
-
+// 0xbe8 ~ 0xc00
+.rept 0x00c
+	// ATTR_HI = 0 means XN = 0
+	// ATTR_LO = 0x74c means
+	// AF = 1
+	// SH = Inner sharable
+	// AP = R/W from higher level and R/W from EL0
+	// NS = non-secure
+	// AttrIndx = 3
+	BLOCK_2MB	(ADDR << 20), 0, 0x748
+	.set		ADDR, ADDR+2
+.endr

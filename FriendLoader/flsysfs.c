@@ -24,17 +24,26 @@ static struct kobj_attribute boot_attr = __ATTR_WO(boot);
 
 static int eof = 0;
 
-/* for dhrystone experiment */
+/* for experiment of dhrystone */
 static ssize_t dump_show(struct kobject *kobj, struct kobj_attribute *attr,
                          char *buf)
 {
     int volatile *flbuf;
+    int cnt;
+    const int timeout = 30;
     if (eof) { return -1; }
 
     flbuf = (int *)__friend_loader_buf;
-    while (flbuf[0] != 2) { ssleep(1); }
+    cnt = 0;
+    while (flbuf[0] < 2 && cnt < timeout) { ssleep(1); cnt++; }
     eof = 1;
-    return sprintf(buf, "\n--- %d ---\n\n", flbuf[8]);
+    if (cnt == timeout)
+        return sprintf(buf, "timeout\n");
+    if (flbuf[0] != 2) {
+        pr_info("friend loader exit status: %d\n", flbuf[0]);
+        return sprintf(buf, "exit %d\n", flbuf[0]);
+    }
+    return sprintf(buf, "%d\n", flbuf[8]);
 }
 
 static ssize_t dump_store(struct kobject *kobj, struct kobj_attribute *attr,

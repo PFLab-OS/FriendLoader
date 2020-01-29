@@ -9,6 +9,15 @@
 MODULE_DESCRIPTION("Friend Loader");
 MODULE_LICENSE("GPL v2");
 
+static void clear_friend_loader_buf(void)
+{
+    int i;
+    for (i = 0; i < 4096/sizeof(long long); i++) {
+        long long *llp = (long long*)__friend_loader_buf;
+        llp[i] = 0;
+    }
+}
+
 static int __init friend_loader_init(void)
 {
     int ret;
@@ -30,8 +39,10 @@ static int __init friend_loader_init(void)
         pr_warn("friend_loader_init: cpu_unplug failed: %d\n", ret);
         return -1;
     }
-
     pr_info("friend_loader_init: cpu %x down\n", ret);
+
+    clear_friend_loader_buf();
+    pr_info("friend_loader_init: buf cleared\n");
 
     return 0;
 }
