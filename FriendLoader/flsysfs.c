@@ -1,11 +1,10 @@
 #include "flsysfs.h"
 #include "cpu_hotplug.h"
 
-#include <linux/delay.h> /* ssleep */
+#include <linux/delay.h>    /* ssleep */
 #include <linux/kobject.h>
 #include <linux/module.h>
 #include <linux/sysfs.h>
-
 
 static ssize_t boot_store(struct kobject *kobj, struct kobj_attribute *attr,
                           const char *buf, size_t count)

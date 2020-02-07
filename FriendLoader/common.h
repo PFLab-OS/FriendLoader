@@ -5,10 +5,6 @@
 // memory space is 80896KB (> 79MB)
 #define PADDR1 0xba700000
 #define PADDR2 0xbc700000
-/*
-#define DEPLOY_PHYS_ADDR_START	0xba700000UL  // 0xba6fc000UL
-#define DEPLOY_PHYS_ADDR_END	0xbf6bffffUL
-*/
 
 // Time measuring
 #include <linux/ktime.h>

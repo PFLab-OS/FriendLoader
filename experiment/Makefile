@@ -40,13 +40,13 @@ OPTIM=
 
 CFLAGS= $(TIME_FUNC) -DHZ=$(HZ) $(ENUMS) $(STRUCTASSIGN) $(MULTIPROC) $(OPTIM)
 
-# include LIBS
 LIBDIR := ../fllib
 LIBS := $(LIBDIR)/entry.S $(LIBDIR)/fllib.c
 
 TOIMG := ../toimg/toimg
-DEPLOY_PADDR1 := 0xba700000
-DEPLOY_PADDR2 := 0xbc700000
+
+# include DEPLOY_PADDR1/2
+include ../common.inc
 
 #NAME := dhry
 NAME := readtask

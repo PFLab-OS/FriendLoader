@@ -1,3 +1,5 @@
+#include "../common.h"
+
 #include <elf.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -8,10 +10,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#define DEPLOY_PADDR1	0xba700000UL
-#define DEPLOY_PADDR2	0xbc700000UL
-
-const unsigned long imgsize_limit = 0x100000UL; /* 1MB */
+const unsigned long imgsize_limit = MAX_PROGRAM_SIZE;
 
 const void *get_mmap_ptr(const char *filename)
 {

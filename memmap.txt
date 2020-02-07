@@ -1,21 +1,21 @@
 This file is memo of physical memory map related to FriendLoader
 a ~ b means a<= x < b is valid address as byte
 
-0x01177000 ~ 0x01178000 (4096B)	friend_loader_buf
-	0x01177000 ~ 0x01177010	system info 
-	0x01177010 ~ 0x01178000	friend task's output
+0x01177000 ~ 0x01178000 (4096B)		friend_loader_buf
+	0x01177000 ~ 0x01177800		first task's region
+		0x01177000 ~ 0x01177020	system info 
+		0x01177010 ~ 0x01177800	friend task's output
+	0x01177800 ~ 0x01178000		first task's region
+		0x01177800 ~ 0x01177820	system info 
+		0x01177820 ~ 0x01178000	friend task's output
 
-0xba700000 ~ 0xbf6c0000 (80896KB > 79MB)	friend task's deploy region
-	0xba700000 ~ 0xbc700000 (32MB)		first task's region
-		0xba700000 ~ 0xba800000 (1MB)	program
-		0xba800000 ~ 0xbc600000 (30MB)	malloc
-		0xbc600000 ~ 0xbc700000	(1MB)	stack
-	0xbc700000 ~ 0xbe700000 (32MB)		second task's region
-		0xbc700000 ~ 0xbc800000 (1MB)	program
-		0xbc800000 ~ 0xbe600000 (30MB)	malloc
-		0xbe600000 ~ 0xbe700000	(1MB)	stack
-	0xbe70000 ~ 0xbe800000 (1MB)		nothing
-	treated as device memory:
-	0xbe800000 ~ 0xbf6c0000 (15104KB > 14MB)	friend kernel's region
-
-
+0xbb000000 ~ 0xbb000000 (64MB)			friend task's deploy region
+	0xbb000000 ~ 0xbc000000 (16MB)		first task's region
+		0xbb000000 ~ 0xbb200000 (2MB)	program
+		0xbb200000 ~ 0xbbd00000 (14MB)	malloc
+		0xbbd00000 ~ 0xbc000000	(1MB)	stack
+	0xbc000000 ~ 0xbc000000 (16MB)		second task's region
+		0xbc000000 ~ 0xbc200000 (2MB)	program
+		0xbc200000 ~ 0xbcd00000 (14MB)	malloc
+		0xbcd00000 ~ 0xbd000000	(1MB)	stack
+	0xbd000000 ~ 0xbf000000 (32MB)		friend kernel's region

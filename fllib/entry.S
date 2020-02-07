@@ -3,13 +3,13 @@
 .globl	_start
 _start:
 
-// sp = DEPLOY_PHYS_ADDR + 31MB - 64KB (align 16)
+// sp = DEPLOY_PADDR + 15MB (align 16)
 #ifdef TASK1
-	mov	x0, #0xbc70
-	movk	x0, #0x0000, lsl #16
+	mov	x0, #0x0000
+	movk	x0, #0xbbe0, lsl #16
 #elif defined TASK2
-	mov	x0, #0xbe70
-	movk	x0, #0x0000, lsl #16
+	mov	x0, #0x0000
+	movk	x0, #0xbce0, lsl #16
 #endif
 	mov	sp, x0
 
@@ -88,6 +88,7 @@ _start:
 	mrs	x1, mair_el2
 	str	w1, [x0, #8]
 	
+/*
 	// set TTBR0_EL2
 	// friend_loader_buf[3] = TTBR0_EL2[31:0]
 	// TTBR0_EL2 is Translation Table Base Register 0 (EL2)
@@ -97,6 +98,7 @@ _start:
 	isb
 	mrs	x1, ttbr0_el2
 	str	w1, [x0, #12]
+*/
 
 	// set SCTLR_EL2
 	// friend_loader[4] = SCTLR_EL2 (0x30c51834)
@@ -122,7 +124,7 @@ _start:
 */
 
 	// jump to startup (in fllib) to jump to main
-	b	startup
+	bl	startup
 
 .globl	exitsucc
 exitsucc:
@@ -159,7 +161,9 @@ loop:
 	b	loop
 
 // Page Tables
+// !!!!!!!!!!!!!!!!! OUTDATED !!!!!!!!!!!!!!!!!!!!!
 
+/*
 .macro PUT_64B		high, low
 	.word \low
 	.word \high
@@ -242,3 +246,4 @@ level2_table2:
 	BLOCK_2MB	(ADDR << 20), 0, 0x748
 	.set		ADDR, ADDR+2
 .endr
+*/

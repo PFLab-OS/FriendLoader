@@ -1,10 +1,10 @@
+#include "cpu_hotplug.h"
+#include "../common.h"
+
 #include <linux/cpu.h>
 #include <linux/psci.h>
 
 #include <asm/smp_plat.h>
-
-#include "common.h"
-#include "cpu_hotplug.h"
 
 #define CPU1 6
 #define CPU2 7
@@ -27,8 +27,8 @@ int __init cpu_unplug(void)
 
 int cpu_start()
 {
-    psci_ops.cpu_on(cpu_logical_map(CPU1), PADDR1);
-    psci_ops.cpu_on(cpu_logical_map(CPU2), PADDR2);
+    psci_ops.cpu_on(cpu_logical_map(CPU1), DEPLOY_PADDR1);
+    psci_ops.cpu_on(cpu_logical_map(CPU2), DEPLOY_PADDR2);
 
     return 0;
 }

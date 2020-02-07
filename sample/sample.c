@@ -45,8 +45,11 @@ int main()
 	}
 	*/
 
+	flbuf_put(0x100);
+	/*
 	char c5[] = "a;kdfjoijkfe;;aiwoejfkjaspi;djfldsafk";
 	flbuf_put((int)strlen(c5));
+	*/
 
 	clock_gettime(CLOCK_MONOTONIC, &ts);
 	flbuf_put((int)ts.tv_nsec);

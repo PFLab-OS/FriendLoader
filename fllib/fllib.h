@@ -26,18 +26,21 @@ void exit(int status);
 
 void flbuf_put(int x);
 
-/* time_t time(time_t* timer); */
 int clock_gettime(clockid_t clk_id, struct timespec *tp);
 
 pid_t fork(void);
 
 void *malloc(size_t size);
 
+/*
 void *memcpy(void *buf1, const void *buf2, size_t n);
+*/
 
 char *strcpy(char *s1, const char *s2);
 int strcmp(const char *s1, const char *s2);
+/*
 size_t strlen(const char *s);
+*/
 
 ssize_t read(int fd, void *buf, size_t count);
 ssize_t write(int fd, const void *buf, size_t count);

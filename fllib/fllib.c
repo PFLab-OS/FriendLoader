@@ -1,11 +1,12 @@
+#include "../common.h"
 #include "fllib.h"
 
 #ifdef TASK1
-#define PADDR			0xba700000
+#define DEPLOY_PADDR		DEPLOY_PADDR1
 #define FRIEND_LOADER_BUF	0x01177000
 #define CPID			1
 #elif defined TASK2
-#define PADDR 			0xbc700000
+#define DEPLOY_PADDR		DEPLOY_PADDR2
 #define FRIEND_LOADER_BUF	0x01177800
 #define CPID			0
 #endif
@@ -15,20 +16,21 @@
  * QUEUE_SIZE is 1MB
  * QUEUE_SIZE should be less than int_max
  */
-#define KERNEL_BASE_PADDR	0xbe700000	
+#define KERNEL_BASE_PADDR	KERNEL_PADDR
 #define NUM_OF_FD		8
 #define QUEUE_SIZE		0x100000
 
+/* +0x20 */
 #define USER_FLBUF_BASE	((int *)FRIEND_LOADER_BUF + 8)
 
 extern int main();
 
 static int * const flbuf_end = (int *)(FRIEND_LOADER_BUF + 0x800);
 
-/* DEPLOY_PHYS_ADDR_START + 1M (for img) */
-static char *malloc_ptr = (char *)PADDR + 0x100000;
-/* DEPLOY_PHYS_ADDR_START + 31M (for stack) */
-static char * const malloc_end = (char *)PADDR + (31 * 0x100000);
+/* DEPLOY_PHYS_ADDR_START + 2M (for img) */
+static char *malloc_ptr = (char *)DEPLOY_PADDR + 0x200000;
+/* DEPLOY_PHYS_ADDR_START + 14M (for stack) */
+static char * const malloc_end = (char *)DEPLOY_PADDR + 0xd00000;
 
 static int volatile *flbuf = USER_FLBUF_BASE;
 
@@ -144,14 +146,17 @@ char *strcpy(char *s1, const char *s2)
 	return s1;
 }
 
+/*
 size_t strlen(const char *s)
 {
+	flbuf_put(0xad);
 	size_t i;
 	for (i = 0; ; i++) {
 		if (s[i] == '\0')
 			return i;
 	}
 }
+*/
 
 ssize_t read(int fd, void *buf, size_t count) {
 	if (count != 4) {

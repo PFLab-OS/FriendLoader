@@ -2,12 +2,12 @@
 *.elf
 pid.txt
 
-/toimg
 /FriendLoader/.cache.mk
 /experiment/others
 /experiment/readtask
 /experiment/res0126
 /sandbox/
+/toimg/toimg
 
 .ssh_config
 
