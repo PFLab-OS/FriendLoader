@@ -1,4 +1,4 @@
-# Friend Loader
+# FriendLoader2
 
 ## Requirements
 
