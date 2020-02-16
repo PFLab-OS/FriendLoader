@@ -1,52 +1,46 @@
+#include "cpu_hotplug.h"
+#include "../common.h"
+
 #include <linux/cpu.h>
 #include <linux/psci.h>
 
 #include <asm/smp_plat.h>
 
-#include "cpu_hotplug.h"
-
-static int unpluged_cpu = -1;
-static void select_unplug_cpu(void);
+#define CPU1 6
+#define CPU2 7
+#define CPUS 0xc0
 
 int __init cpu_unplug(void)
 {
     int ret;
 
-    select_unplug_cpu();
-
-    ret = cpu_down(unpluged_cpu);
-    if (ret < 0) {
+    ret = cpu_down(CPU1);
+    if (ret < 0)
         return ret;
-    }
 
-    return unpluged_cpu;
+    ret = cpu_down(CPU2);
+    if (ret < 0)
+        return ret;
+
+    return CPUS;
 }
 
-int cpu_start(phys_addr_t entry_point)
+int cpu_start()
 {
-    if (unpluged_cpu == -1) {
-        return -1;
-    }
-
-    psci_ops.cpu_on(cpu_logical_map(unpluged_cpu), entry_point);
+    psci_ops.cpu_on(cpu_logical_map(CPU1), DEPLOY_PADDR1);
+    psci_ops.cpu_on(cpu_logical_map(CPU2), DEPLOY_PADDR2);
 
     return 0;
 }
 
 int __exit cpu_replug(void)
 {
-    int ret = cpu_up(unpluged_cpu);
-    if (ret < 0) {
+    int ret = cpu_up(CPU1);
+    if (ret < 0)
         return ret;
-    }
+    ret = cpu_up(CPU2);
+    if (ret < 0)
+        return ret;
 
-    return unpluged_cpu;
-}
-
-static void select_unplug_cpu(void)
-{
-    // TODO: Choose an appropriate CPU regarding situation.
-    //       Currently choosing CPU 7 by deciding.
-
-    unpluged_cpu = 7;
+    return CPUS;
 }

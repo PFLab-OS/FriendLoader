@@ -2,11 +2,12 @@
 
 // File deployment
 // XXX: Assuming Linux is running on HiKey960 board and with `mem=2G` boot parameter.
-#define DEPLOY_PHYS_ADDR_START 0xba700000UL  // 0xba6fc000UL
-#define DEPLOY_PHYS_ADDR_END 0xbf6bffffUL
+// memory space is 80896KB (> 79MB)
+#define PADDR1 0xba700000
+#define PADDR2 0xbc700000
 
 // Time measuring
-#include <linux/time.h>
+#include <linux/ktime.h>
 
 static inline long ktime_diff_ns(ktime_t start, ktime_t end)
 {

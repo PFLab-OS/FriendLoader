@@ -1,0 +1,7 @@
+#pragma once
+
+#define DEPLOY_PADDR1	0xbb000000
+#define DEPLOY_PADDR2	0xbc000000
+#define KERNEL_PADDR	0xbd000000
+
+#define MAX_PROGRAM_SIZE	0x200000	/* 2MB */

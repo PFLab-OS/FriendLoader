@@ -4,11 +4,11 @@
 #include <linux/types.h>
 
 // Unplug CPU.
-// Returns unpluged CPU number, or negative number on error.
+// Returns unpluged CPU number(bitmask), or negative number on error.
 int __init cpu_unplug(void);
 
-int cpu_start(phys_addr_t entry_point);
+int cpu_start(void);
 
 // Replug CPU.
-// Returns repluged CPU number, or negative number on error.
+// Returns repluged CPU number(bitmask), or negative number on error.
 int __exit cpu_replug(void);
